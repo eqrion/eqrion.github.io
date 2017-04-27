@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<select id="select">
+</select>
+
+<select id="multiple" multiple>
+</select>
+
+<script type="text/javascript">
+    function fill(select) {
+        for (var i = 1; i < 100; ++i) {
+            var opt = document.createElement("option");
+            opt.value = i;
+            opt.text = '' + i;
+            select.add(opt, null);
+        }
+    }
+
+    fill(document.getElementById('select'));
+    fill(document.getElementById('multiple'));
+</script>
+
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<style type="text/css">
+    .yellow {
+        width: 100px;
+        height: 100px;
+        background-color: rgb(255, 255, 0);
+    }
+    .green {
+        width: 100px;
+        height: 100px;
+        margin-top: 10px;
+        margin-left: 10px;
+        background-color: rgb(0, 255, 0);
+    }
+    .mbm {
+        mix-blend-mode: multiply;
+    }
+    .stacking-context {
+        position: absolute;
+        z-index: 1;
+    }
+</style>
+
+<!-- should see just the green box hiding the yellow box -->
+<!-- the stacking context should create a new transparent backdrop for its children with mix-blend-mode -->
+<!-- if this doesn't happen the green box will do difference with yellow creating red -->
+<div class="yellow">
+    <div class="stacking-context">
+        <div class="green mbm">
+        </div>
+    </div>
+</div>
+
+</html>

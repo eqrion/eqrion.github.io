@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<!-- these should all be equivalent -->
+<style type="text/css">
+    .a {
+        background-image: radial-gradient(circle closest-side,
+                red 0%,
+                red 10%,
+                blue 10%,
+                blue 20%,
+                red 20%,
+                red 30%,
+                blue 30%,
+                blue 40%,
+                red 40%,
+                red 50%,
+                blue 50%,
+                blue 60%,
+                red 60%,
+                red 70%,
+                blue 70%,
+                blue 80%,
+                red 80%,
+                red 90%,
+                blue 90%,
+                blue 100%,
+                red 100%,
+                red 110%,
+                blue 110%,
+                blue 120%,
+                red 120%,
+                red 130%,
+                blue 130%,
+                blue 140%);
+        width: 300px;
+        height: 300px;
+        margin-bottom: 1em;
+    }
+    .b {
+        background-image: repeating-radial-gradient(circle closest-side,
+                red 20%,
+                red 30%,
+                blue 30%,
+                blue 40%);
+        width: 300px;
+        height: 300px;
+        margin-bottom: 1em;
+    }
+    .ref {
+        background-image: repeating-radial-gradient(circle closest-side,
+                red 0%,
+                red 10%,
+                blue 10%,
+                blue 20%);
+        width: 300px;
+        height: 300px;
+        margin-bottom: 1em;
+    }
+</style>
+
+<div class="a">
+</div>
+<div class="b">
+</div>
+<div class="ref">
+</div>
+
+</html>
