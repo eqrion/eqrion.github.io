@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<style type="text/css">
+    #scroll {
+      width: 100%;
+      overflow: auto;
+      white-space: nowrap;
+      scroll-snap-points-x: repeat(100%);
+      scroll-snap-type: mandatory;
+      font-size: 0;
+    }
+    #scroll > div {
+      width: 100%;
+      height: 100px;
+      display: inline-block;
+      line-height: 100px;
+      text-align: center;
+      font-size: 50px;
+    }
+    #scroll > div:nth-child(even) {
+      background-color: red;
+    }
+    #scroll > div:nth-child(odd) {
+      background-color: blue;
+    }
+</style>
+
+<div id="scroll">
+    <div></div>
+    <div></div>
+    <div></div>
+</div>
+
+</html>
