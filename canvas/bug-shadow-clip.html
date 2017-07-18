@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<style type="text/css">
+	canvas {
+		width: 300px;
+		height: 150px;
+		border: 1px solid #d3d3d3;
+	}
+</style>
+
+<canvas>
+</canvas>
+
+<script type="text/javascript">
+	var canvas = document.querySelector('canvas');
+	var ctx = canvas.getContext("2d");
+
+	ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
+	ctx.shadowBlur = 10;
+
+	// Clip a rectangular area
+	ctx.rect(50, 20, 200, 120);
+	ctx.stroke();
+	ctx.clip();
+
+	// Draw red rectangle after clip()
+	ctx.fillStyle = "red";
+	ctx.fillRect(0, 0, 150, 100);
+</script>
+
+</html>

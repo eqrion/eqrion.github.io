@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<style type="text/css">
+    canvas {
+        border: 1px solid #d3d3d3;
+    }
+</style>
+
+<span>With Clip</span>
+<canvas id="a" width="300" height="300">
+</canvas>
+
+<span>Without Clip</span>
+<canvas id="b" width="300" height="300">
+</canvas>
+
+<script type="text/javascript">
+    function withClip(canvas) {
+        var ctx = canvas.getContext("2d");
+
+        // Clip a rectangular area
+        ctx.rect(20, 20, 260, 260);
+        ctx.stroke();
+        ctx.clip();
+
+        // Draw red rectangle after clip()
+        ctx.fillStyle = "red";
+        ctx.fillRect(10, 10, 150, 150);
+    }
+
+    function withoutClip(canvas) {
+        var ctx = canvas.getContext("2d");
+
+        // Clip a rectangular area
+        ctx.rect(20, 20, 260, 260);
+        ctx.stroke();
+
+        ctx.globalCompositeOperator = 'multiply';
+
+        // Draw red rectangle after clip()
+        ctx.fillStyle = "red";
+        ctx.fillRect(10, 10, 150, 150);
+    }
+
+    withClip(document.getElementById('a'));
+    withoutClip(document.getElementById('b'));
+</script>
+
+</html>

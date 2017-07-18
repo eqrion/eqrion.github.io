@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+		div {
+			display: inline-block;
+			width: 200px;
+			height: 400px;
+			overflow: scroll;
+		}
+	</style>
+</head>
+<body>
+
+<div id="a">
+</div>
+
+<div id="b">
+</div>
+
+<script type="text/javascript">
+    function fill(element) {
+        var text = '';
+        for (var i = 1; i < 10000; ++i) {
+            text = text + i + '\n';
+        }
+        element.innerText = text;
+    }
+
+    let a = document.querySelector('div#a');
+    let b = document.querySelector('div#b');
+
+    fill(a);
+    fill(b);
+
+    // document.addEventListener('keydown', function (e) {
+    // 	e.preventDefault();
+    // });
+
+    // Will not run
+    b.addEventListener('keydown', function (e) {
+    	e.preventDefault();
+    });
+</script>
+
+</body>
+</html>
