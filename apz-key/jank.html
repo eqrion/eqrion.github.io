@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<script type="application/javascript">
+function insertText(element) {
+    var text = '';
+    for (var i = 0; i < 1000; ++i) {
+        text = text + i + '\n';
+    }
+    element.innerText = text;
+}
+function wasteTime() {
+    for (var i = 0; i < 20; ++i) {
+        insertText(document.querySelector('html'))
+    }
+    setTimeout(wasteTime);
+}
+setTimeout(wasteTime, 0);
+</script>
+</html>

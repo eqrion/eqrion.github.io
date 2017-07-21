@@ -7,44 +7,42 @@
     }
 </style>
 
-<span>With Clip</span>
+<span>With Composite</span>
 <canvas id="a" width="300" height="300">
 </canvas>
 
-<span>Without Clip</span>
+<span>Without Composite</span>
 <canvas id="b" width="300" height="300">
 </canvas>
 
 <script type="text/javascript">
-    function withClip(canvas) {
+    function withComposite(canvas) {
         var ctx = canvas.getContext("2d");
 
-        // Clip a rectangular area
-        ctx.rect(20, 20, 260, 260);
-        ctx.stroke();
+        ctx.globalCompositeOperation = "color";
+        ctx.rect(10, 10, 160, 160);
         ctx.clip();
 
-        // Draw red rectangle after clip()
-        ctx.fillStyle = "red";
+        ctx.fillStyle = "blue";
         ctx.fillRect(10, 10, 150, 150);
+        ctx.fillStyle = "red";
+        ctx.fillRect(50, 50, 150, 150);
     }
 
-    function withoutClip(canvas) {
+    function withoutComposite(canvas) {
         var ctx = canvas.getContext("2d");
 
-        // Clip a rectangular area
-        ctx.rect(20, 20, 260, 260);
-        ctx.stroke();
+        ctx.rect(10, 10, 160, 160);
+        ctx.clip();
 
-        ctx.globalCompositeOperator = 'multiply';
-
-        // Draw red rectangle after clip()
-        ctx.fillStyle = "red";
+        ctx.fillStyle = "blue";
         ctx.fillRect(10, 10, 150, 150);
+        ctx.fillStyle = "red";
+        ctx.fillRect(50, 50, 150, 150);
     }
 
-    withClip(document.getElementById('a'));
-    withoutClip(document.getElementById('b'));
+    withComposite(document.getElementById('a'));
+    withoutComposite(document.getElementById('b'));
 </script>
 
 </html>
