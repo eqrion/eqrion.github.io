@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<body>
+</body>
+<script type="text/javascript">
+function fill(element) {
+    var text = '';
+    for (var i = 0; i < 1000; ++i) {
+        text = text + i + '\n';
+    }
+    element.innerText = text;
+}
+fill(document.querySelector('body'));
+
+addEventListener('mousemove', function (e) {
+    var r = ~~(Math.random() * 255);
+    var g = ~~(Math.random() * 255);
+    var b = ~~(Math.random() * 255);
+    document.querySelector('body').style['background-color'] = 'rgb(' + r + ',' + g + ',' + b + ')';
+}, { passive: true });
+</script>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<iframe
+    width="400"
+    height="400"
+    src="mousemove-4-helper.html">
+</iframe>
+
+<div id="dummy"></div>
+
+<script type="text/javascript">
+function fill(element) {
+    var text = '';
+    for (var i = 0; i < 1000; ++i) {
+        text = text + i + '\n';
+    }
+    element.innerText = text;
+}
+
+var dummy = document.querySelector('#dummy');
+fill(dummy);
+dummy.addEventListener('mousemove', function (e) {
+    var r = ~~(Math.random() * 255);
+    var g = ~~(Math.random() * 255);
+    var b = ~~(Math.random() * 255);
+    document.querySelector('body').style['background-color'] = 'rgb(' + r + ',' + g + ',' + b + ')';
+}, { passive: true });
+
+var iframe = document.querySelector('iframe');
+
+function transferNode() {
+    iframe.contentDocument.body.appendChild(dummy);
+}
+
+if (iframe.contentWindow.ready) {
+    onReady();
+} else {
+    iframe.contentWindow.onready = transferNode;
+}
+
+iframe.contentDocument.body.style.backgroundColor = 'blue';
+</script>
+
+</html>
