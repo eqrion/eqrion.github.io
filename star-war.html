@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<style type="text/css">
+    html {
+        background-color: black;
+        overflow: hidden
+    }
+    #scrawl {
+        color: yellow;
+        transform: translate(-25%, 0px) perspective(50px) rotateX(5deg);
+        text-align: center;
+        overflow-y: scroll;
+        height: 1000px;
+        width: 200%;
+    }
+    #overlay {
+        position: fixed;
+        z-index: 1;
+        background-image: linear-gradient(to bottom, black 0%, rgba(0,0,0,255) 90%, rgba(0,0,0,0) 100%);
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 28%;
+    }
+    #spacer-top {
+        height: 800px;
+    }
+    #spacer-bottom {
+        height: 1000px;
+    }
+</style>
+
+<div id="overlay"></div>
+<div id="scrawl">
+    <div id="spacer-top"></div>
+    <div id="crawl">
+    <h2>EPISODE IV</h2>
+    <h1>A NEW HOPE</h1>
+    It is a period of civil war. Rebel spaceships, <br>
+    striking from a hidden base, have won their first <br>
+    victory against the evil Galactic Empire.<br>
+    <br>
+    During the battle, Rebel spies managed to steal <br>
+    secret plans to the Empire's ultimate weapon, the <br>
+    Death Star, an armored space station with enough <br>
+    power to destroy an entire planet.<br>
+    <br>
+    Pursued by the Empire's sinister agents, Princess <br>
+    Leia races home aboard her starship, custodian of <br>
+    the stolen plans that can save her people and <br>
+    restore freedom to the galaxy...<br>
+    </div>
+    <div id="spacer-bottom"></div>
+</div>
+
+<script type="text/javascript">
+    function doScrawl() {
+        var scrawl = document.getElementById('scrawl');
+        scrawl.scrollTop = 0;
+
+        var leftToScroll = 2000;
+        let previous = null;
+        function animate(timestamp) {
+            if (!previous) {
+                previous = timestamp - (1000 / 60);
+            }
+            var delta = timestamp - previous;
+
+            var scrollChange = Math.floor((delta / 1000) * 60);
+            var newLeftToScroll = Math.max(leftToScroll - scrollChange, 0);
+            scrollChange = leftToScroll - newLeftToScroll;
+            leftToScroll -= scrollChange;
+
+            scrawl.scrollTop += scrollChange;
+
+            previous = timestamp;
+            requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    doScrawl();
+</script>
+
+</html>
