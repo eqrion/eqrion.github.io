@@ -74,6 +74,12 @@
 <span id="29">29</span>
 <span id="30">30</span>
 <span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
 </pre><pre class="rust ">
 <span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -81,8 +87,10 @@
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">annotation</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">cfg</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">constant</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">enumeration</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">function</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">global</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">item</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">opaque</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">path</span>;
@@ -91,12 +99,15 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">structure</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ty</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">typedef</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">union</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">documentation</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">annotation</span>::{<span class="ident">AnnotationSet</span>, <span class="ident">AnnotationValue</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">cfg</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">constant</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">enumeration</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">function</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">global</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">item</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">opaque</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">path</span>::<span class="kw-2">*</span>;
@@ -105,6 +116,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">structure</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">ty</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">typedef</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">union</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">documentation</span>::<span class="ident">Documentation</span>;
 </pre>
 </section>

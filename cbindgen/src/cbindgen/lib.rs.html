@@ -117,10 +117,10 @@
                             <span class="prelude-val">None</span>,
                             <span class="ident">config</span>.<span class="ident">parse</span>.<span class="ident">parse_deps</span>)<span class="question-mark">?</span>;
 
-    <span class="ident">LibraryBuilder</span>::<span class="ident">new</span>().<span class="ident">with_config</span>(<span class="ident">config</span>)
-                         .<span class="ident">with_std_types</span>()
-                         .<span class="ident">with_crate</span>(<span class="ident">cargo</span>)
-                         .<span class="ident">build</span>()<span class="question-mark">?</span>.<span class="ident">generate</span>()
+    <span class="ident">Builder</span>::<span class="ident">new</span>().<span class="ident">with_config</span>(<span class="ident">config</span>)
+                  .<span class="ident">with_std_types</span>()
+                  .<span class="ident">with_crate</span>(<span class="ident">cargo</span>)
+                  .<span class="ident">generate</span>()
 }
 </pre>
 </section>

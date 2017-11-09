@@ -48,7 +48,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/cbindgen/bindgen/config.rs.html#292-330' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/cbindgen/bindgen/config.rs.html#310-351' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Config {
     pub header: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;,
     pub trailer: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;,
@@ -65,89 +65,122 @@
     pub function: <a class="struct" href="../cbindgen/struct.FunctionConfig.html" title="struct cbindgen::FunctionConfig">FunctionConfig</a>,
     pub structure: <a class="struct" href="../cbindgen/struct.StructConfig.html" title="struct cbindgen::StructConfig">StructConfig</a>,
     pub enumeration: <a class="struct" href="../cbindgen/struct.EnumConfig.html" title="struct cbindgen::EnumConfig">EnumConfig</a>,
+    pub constant: <a class="struct" href="../cbindgen/struct.ConstantConfig.html" title="struct cbindgen::ConstantConfig">ConstantConfig</a>,
     pub defines: <a class="struct" href="https://doc.rust-lang.org/nightly/std/collections/hash/map/struct.HashMap.html" title="struct std::collections::hash::map::HashMap">HashMap</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>, <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;,
     pub documentation: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>,
 }</pre><div class='docblock'><p>A collection of settings to customize the generated bindings.</p>
-</div><h2 id='fields' class='fields'>Fields</h2><span id='structfield.header' class="structfield">
-                           <span id='header.v' class='invisible'>
+</div><h2 id='fields' class='fields small-section-header'>
+                       Fields<a href='#fields' class='anchor'></a></h2><span id="structfield.header" class="structfield small-section-header">
+                           <a href="#structfield.header" class="anchor field"></a>
+                           <span id="header.v" class='invisible'>
                            <code>header: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</code>
                            </span></span><div class='docblock'><p>Optional text to output at the beginning of the file</p>
-</div><span id='structfield.trailer' class="structfield">
-                           <span id='trailer.v' class='invisible'>
+</div><span id="structfield.trailer" class="structfield small-section-header">
+                           <a href="#structfield.trailer" class="anchor field"></a>
+                           <span id="trailer.v" class='invisible'>
                            <code>trailer: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</code>
                            </span></span><div class='docblock'><p>Optional text to output at the end of the file</p>
-</div><span id='structfield.include_guard' class="structfield">
-                           <span id='include_guard.v' class='invisible'>
+</div><span id="structfield.include_guard" class="structfield small-section-header">
+                           <a href="#structfield.include_guard" class="anchor field"></a>
+                           <span id="include_guard.v" class='invisible'>
                            <code>include_guard: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</code>
                            </span></span><div class='docblock'><p>Optional name to use for an include guard</p>
-</div><span id='structfield.autogen_warning' class="structfield">
-                           <span id='autogen_warning.v' class='invisible'>
+</div><span id="structfield.autogen_warning" class="structfield small-section-header">
+                           <a href="#structfield.autogen_warning" class="anchor field"></a>
+                           <span id="autogen_warning.v" class='invisible'>
                            <code>autogen_warning: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</code>
                            </span></span><div class='docblock'><p>Optional text to output at major sections to deter manual editing</p>
-</div><span id='structfield.include_version' class="structfield">
-                           <span id='include_version.v' class='invisible'>
+</div><span id="structfield.include_version" class="structfield small-section-header">
+                           <a href="#structfield.include_version" class="anchor field"></a>
+                           <span id="include_version.v" class='invisible'>
                            <code>include_version: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code>
                            </span></span><div class='docblock'><p>Include a comment with the version of cbindgen used to generate the file</p>
-</div><span id='structfield.namespace' class="structfield">
-                           <span id='namespace.v' class='invisible'>
+</div><span id="structfield.namespace" class="structfield small-section-header">
+                           <a href="#structfield.namespace" class="anchor field"></a>
+                           <span id="namespace.v" class='invisible'>
                            <code>namespace: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</code>
                            </span></span><div class='docblock'><p>An optional name for the root namespace. Only applicable when language=&quot;C++&quot;</p>
-</div><span id='structfield.namespaces' class="structfield">
-                           <span id='namespaces.v' class='invisible'>
+</div><span id="structfield.namespaces" class="structfield small-section-header">
+                           <a href="#structfield.namespaces" class="anchor field"></a>
+                           <span id="namespaces.v" class='invisible'>
                            <code>namespaces: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;&gt;</code>
                            </span></span><div class='docblock'><p>An optional list of namespaces. Only applicable when language=&quot;C++&quot;</p>
-</div><span id='structfield.braces' class="structfield">
-                           <span id='braces.v' class='invisible'>
+</div><span id="structfield.braces" class="structfield small-section-header">
+                           <a href="#structfield.braces" class="anchor field"></a>
+                           <span id="braces.v" class='invisible'>
                            <code>braces: <a class="enum" href="../cbindgen/enum.Braces.html" title="enum cbindgen::Braces">Braces</a></code>
                            </span></span><div class='docblock'><p>The style to use for braces</p>
-</div><span id='structfield.line_length' class="structfield">
-                           <span id='line_length.v' class='invisible'>
+</div><span id="structfield.line_length" class="structfield small-section-header">
+                           <a href="#structfield.line_length" class="anchor field"></a>
+                           <span id="line_length.v" class='invisible'>
                            <code>line_length: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code>
                            </span></span><div class='docblock'><p>The preferred length of a line, used for auto breaking function arguments</p>
-</div><span id='structfield.tab_width' class="structfield">
-                           <span id='tab_width.v' class='invisible'>
+</div><span id="structfield.tab_width" class="structfield small-section-header">
+                           <a href="#structfield.tab_width" class="anchor field"></a>
+                           <span id="tab_width.v" class='invisible'>
                            <code>tab_width: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code>
                            </span></span><div class='docblock'><p>The amount of spaces in a tab</p>
-</div><span id='structfield.language' class="structfield">
-                           <span id='language.v' class='invisible'>
+</div><span id="structfield.language" class="structfield small-section-header">
+                           <a href="#structfield.language" class="anchor field"></a>
+                           <span id="language.v" class='invisible'>
                            <code>language: <a class="enum" href="../cbindgen/enum.Language.html" title="enum cbindgen::Language">Language</a></code>
                            </span></span><div class='docblock'><p>The language to output bindings for</p>
-</div><span id='structfield.parse' class="structfield">
-                           <span id='parse.v' class='invisible'>
+</div><span id="structfield.parse" class="structfield small-section-header">
+                           <a href="#structfield.parse" class="anchor field"></a>
+                           <span id="parse.v" class='invisible'>
                            <code>parse: <a class="struct" href="../cbindgen/struct.ParseConfig.html" title="struct cbindgen::ParseConfig">ParseConfig</a></code>
                            </span></span><div class='docblock'><p>The configuration options for parsing</p>
-</div><span id='structfield.function' class="structfield">
-                           <span id='function.v' class='invisible'>
+</div><span id="structfield.function" class="structfield small-section-header">
+                           <a href="#structfield.function" class="anchor field"></a>
+                           <span id="function.v" class='invisible'>
                            <code>function: <a class="struct" href="../cbindgen/struct.FunctionConfig.html" title="struct cbindgen::FunctionConfig">FunctionConfig</a></code>
                            </span></span><div class='docblock'><p>The configuration options for functions</p>
-</div><span id='structfield.structure' class="structfield">
-                           <span id='structure.v' class='invisible'>
+</div><span id="structfield.structure" class="structfield small-section-header">
+                           <a href="#structfield.structure" class="anchor field"></a>
+                           <span id="structure.v" class='invisible'>
                            <code>structure: <a class="struct" href="../cbindgen/struct.StructConfig.html" title="struct cbindgen::StructConfig">StructConfig</a></code>
                            </span></span><div class='docblock'><p>The configuration options for structs</p>
-</div><span id='structfield.enumeration' class="structfield">
-                           <span id='enumeration.v' class='invisible'>
+</div><span id="structfield.enumeration" class="structfield small-section-header">
+                           <a href="#structfield.enumeration" class="anchor field"></a>
+                           <span id="enumeration.v" class='invisible'>
                            <code>enumeration: <a class="struct" href="../cbindgen/struct.EnumConfig.html" title="struct cbindgen::EnumConfig">EnumConfig</a></code>
                            </span></span><div class='docblock'><p>The configuration options for enums</p>
-</div><span id='structfield.defines' class="structfield">
-                           <span id='defines.v' class='invisible'>
+</div><span id="structfield.constant" class="structfield small-section-header">
+                           <a href="#structfield.constant" class="anchor field"></a>
+                           <span id="constant.v" class='invisible'>
+                           <code>constant: <a class="struct" href="../cbindgen/struct.ConstantConfig.html" title="struct cbindgen::ConstantConfig">ConstantConfig</a></code>
+                           </span></span><div class='docblock'><p>The configuration options for constants</p>
+</div><span id="structfield.defines" class="structfield small-section-header">
+                           <a href="#structfield.defines" class="anchor field"></a>
+                           <span id="defines.v" class='invisible'>
                            <code>defines: <a class="struct" href="https://doc.rust-lang.org/nightly/std/collections/hash/map/struct.HashMap.html" title="struct std::collections::hash::map::HashMap">HashMap</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>, <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</code>
-                           </span></span><span id='structfield.documentation' class="structfield">
-                           <span id='documentation.v' class='invisible'>
+                           </span></span><div class='docblock'><p>Preprocessor defines to use when generating #ifdef&#39;s for #[cfg]</p>
+</div><span id="structfield.documentation" class="structfield small-section-header">
+                           <a href="#structfield.documentation" class="anchor field"></a>
+                           <span id="documentation.v" class='invisible'>
                            <code>documentation: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code>
                            </span></span><div class='docblock'><p>Include doc comments from rust as documentation</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/cbindgen/bindgen/config.rs.html#356-383' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.from_file' class="method"><span id='from_file.v' class='invisible'><code>fn <a href='#method.from_file' class='fnname'>from_file</a>(file_name: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a>, <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</code></span></h4>
-<h4 id='method.from_root_or_default' class="method"><span id='from_root_or_default.v' class='invisible'><code>fn <a href='#method.from_root_or_default' class='fnname'>from_root_or_default</a>(root: &amp;<a class="struct" href="https://doc.rust-lang.org/nightly/std/path/struct.Path.html" title="struct std::path::Path">Path</a>) -&gt; <a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a></code></span></h4>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/cbindgen/bindgen/config.rs.html#288' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span></h4>
+</div>
+                    <h2 id='methods' class='small-section-header'>
+                      Methods<a href='#methods' class='anchor'></a>
+                    </h2>
+                <h3 id='impl' class='impl'><span class='in-band'><code>impl <a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a></code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/cbindgen/bindgen/config.rs.html#378-405' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.from_file' class="method"><span id='from_file.v' class='invisible'><code>pub fn <a href='#method.from_file' class='fnname'>from_file</a>(file_name: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a>, <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/cbindgen/bindgen/config.rs.html#379-394' title='goto source code'>[src]</a></span></h4>
+<h4 id='method.from_root_or_default' class="method"><span id='from_root_or_default.v' class='invisible'><code>pub fn <a href='#method.from_root_or_default' class='fnname'>from_root_or_default</a>(root: &amp;<a class="struct" href="https://doc.rust-lang.org/nightly/std/path/struct.Path.html" title="struct std::path::Path">Path</a>) -&gt; <a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/cbindgen/bindgen/config.rs.html#396-404' title='goto source code'>[src]</a></span></h4>
+</div>
+            <h2 id='implementations' class='small-section-header'>
+              Trait Implementations<a href='#implementations' class='anchor'></a>
+            </h2>
+        <h3 id='impl-Debug' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a></code><a href='#impl-Debug' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/cbindgen/bindgen/config.rs.html#306' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/cbindgen/bindgen/config.rs.html#306' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/cbindgen/bindgen/config.rs.html#288' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a></code></span></h4>
+</div></div><h3 id='impl-Clone' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a></code><a href='#impl-Clone' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/cbindgen/bindgen/config.rs.html#306' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/cbindgen/bindgen/config.rs.html#306' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
-</div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+</div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;</a>Self)</code></span><span class='out-of-band'><div class='ghost'></div><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/clone.rs.html#112-114' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html" title="trait core::default::Default">Default</a> for <a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/cbindgen/bindgen/config.rs.html#332-354' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.default' class="method"><span id='default.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default' class='fnname'>default</a>() -&gt; <a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a></code></span></h4>
+</div></div><h3 id='impl-Default' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html" title="trait core::default::Default">Default</a> for <a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a></code><a href='#impl-Default' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/cbindgen/bindgen/config.rs.html#353-376' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.default' class="method"><span id='default.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default' class='fnname'>default</a>() -&gt; <a class="struct" href="../cbindgen/struct.Config.html" title="struct cbindgen::Config">Config</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/cbindgen/bindgen/config.rs.html#354-375' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns the &quot;default value&quot; for a type. <a href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default">Read more</a></p>
 </div></div></section>
     <section id='search' class="content hidden"></section>

@@ -312,6 +312,57 @@
 <span id="267">267</span>
 <span id="268">268</span>
 <span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
 </pre><pre class="rust ">
 <span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -323,7 +374,7 @@
 
 <span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">config</span>::{<span class="ident">Config</span>, <span class="ident">Language</span>};
 <span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">dependencies</span>::<span class="ident">Dependencies</span>;
-<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">ir</span>::{<span class="ident">AnnotationSet</span>, <span class="ident">Cfg</span>, <span class="ident">CfgWrite</span>, <span class="ident">Documentation</span>, <span class="ident">Repr</span>, <span class="ident">Type</span>};
+<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">ir</span>::{<span class="ident">AnnotationSet</span>, <span class="ident">Cfg</span>, <span class="ident">CfgWrite</span>, <span class="ident">Documentation</span>, <span class="ident">ItemContainer</span>, <span class="ident">Item</span>, <span class="ident">Repr</span>, <span class="ident">Specialization</span>, <span class="ident">Type</span>};
 <span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">library</span>::<span class="ident">Library</span>;
 <span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">mangle</span>;
 <span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">monomorph</span>::<span class="ident">Monomorphs</span>;
@@ -350,7 +401,7 @@
                 <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Struct</span>, <span class="ident">String</span><span class="op">&gt;</span>
     {
         <span class="kw">if</span> <span class="ident">Repr</span>::<span class="ident">load</span>(<span class="ident">attrs</span>) <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">C</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;struct is not marked #[repr(C)]&quot;</span>.<span class="ident">to_owned</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Struct is not marked #[repr(C)].&quot;</span>.<span class="ident">to_owned</span>());
         }
 
         <span class="kw">let</span> (<span class="ident">fields</span>, <span class="ident">tuple_struct</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">decl</span> {
@@ -390,14 +441,14 @@
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_generic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">generic_params</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simplify_option_to_ptr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (_, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">ty</span>, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">fields</span> {
+            <span class="ident">ty</span>.<span class="ident">simplify_option_to_ptr</span>();
+        }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_dependencies</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">library</span>: <span class="kw-2">&amp;</span><span class="ident">Library</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Dependencies</span>) {
-        <span class="kw">for</span> <span class="kw-2">&amp;</span>(_, <span class="kw-2">ref</span> <span class="ident">ty</span>, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fields</span> {
-            <span class="ident">ty</span>.<span class="ident">add_dependencies_ignoring_generics</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">generic_params</span>, <span class="ident">library</span>, <span class="ident">out</span>);
-        }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_generic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">generic_params</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_monomorphs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">library</span>: <span class="kw-2">&amp;</span><span class="ident">Library</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Monomorphs</span>) {
@@ -412,39 +463,35 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instantiate_monomorph</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">library</span>: <span class="kw-2">&amp;</span><span class="ident">Library</span>, <span class="ident">generic_values</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Monomorphs</span>) {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">generic_params</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span>
-                <span class="self">self</span>.<span class="ident">generic_params</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">generic_values</span>.<span class="ident">len</span>());
-
-        <span class="kw">let</span> <span class="ident">mappings</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">generic_params</span>.<span class="ident">iter</span>()
-                                          .<span class="ident">zip</span>(<span class="ident">generic_values</span>.<span class="ident">iter</span>())
-                                          .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>();
-
-        <span class="kw">let</span> <span class="ident">monomorph</span> <span class="op">=</span> <span class="ident">Struct</span> {
-            <span class="ident">name</span>: <span class="ident">mangle</span>::<span class="ident">mangle_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>, <span class="ident">generic_values</span>),
-            <span class="ident">generic_params</span>: <span class="macro">vec</span><span class="macro">!</span>[],
-            <span class="ident">fields</span>: <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>()
-                               .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="ident">x</span>.<span class="number">0</span>.<span class="ident">clone</span>(), <span class="ident">x</span>.<span class="number">1</span>.<span class="ident">specialize</span>(<span class="kw-2">&amp;</span><span class="ident">mappings</span>), <span class="ident">x</span>.<span class="number">2</span>.<span class="ident">clone</span>()))
-                               .<span class="ident">collect</span>(),
-            <span class="ident">tuple_struct</span>: <span class="self">self</span>.<span class="ident">tuple_struct</span>,
-            <span class="ident">cfg</span>: <span class="self">self</span>.<span class="ident">cfg</span>.<span class="ident">clone</span>(),
-            <span class="ident">annotations</span>: <span class="self">self</span>.<span class="ident">annotations</span>.<span class="ident">clone</span>(),
-            <span class="ident">documentation</span>: <span class="self">self</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>(),
-        };
-
-        <span class="comment">// Instantiate any monomorphs for any generic paths we may have just created.</span>
-        <span class="ident">monomorph</span>.<span class="ident">add_monomorphs</span>(<span class="ident">library</span>, <span class="ident">out</span>);
-
-        <span class="ident">out</span>.<span class="ident">insert_struct</span>(<span class="self">self</span>, <span class="ident">monomorph</span>, <span class="ident">generic_values</span>.<span class="ident">clone</span>());
-    }
-
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mangle_paths</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">monomorphs</span>: <span class="kw-2">&amp;</span><span class="ident">Monomorphs</span>) {
         <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (_, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">ty</span>, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">fields</span> {
             <span class="ident">ty</span>.<span class="ident">mangle_paths</span>(<span class="ident">monomorphs</span>);
         }
     }
+}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rename_fields</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) {
+<span class="kw">impl</span> <span class="ident">Item</span> <span class="kw">for</span> <span class="ident">Struct</span> {
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">cfg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cfg</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">annotations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AnnotationSet</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">annotations</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">annotations_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AnnotationSet</span> {
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">annotations</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">container</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">ItemContainer</span> {
+        <span class="ident">ItemContainer</span>::<span class="ident">Struct</span>(<span class="self">self</span>.<span class="ident">clone</span>())
+    }
+
+    <span class="kw">fn</span> <span class="ident">rename_for_config</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) {
         <span class="kw">let</span> <span class="ident">rules</span> <span class="op">=</span> [<span class="self">self</span>.<span class="ident">annotations</span>.<span class="ident">parse_atom</span>::<span class="op">&lt;</span><span class="ident">RenameRule</span><span class="op">&gt;</span>(<span class="string">&quot;rename-all&quot;</span>),
                      <span class="ident">config</span>.<span class="ident">structure</span>.<span class="ident">rename_fields</span>];
 
@@ -474,6 +521,61 @@
                 <span class="ident">name</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="string">&#39;_&#39;</span>);
             }
         }
+    }
+
+    <span class="kw">fn</span> <span class="ident">add_dependencies</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">library</span>: <span class="kw-2">&amp;</span><span class="ident">Library</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Dependencies</span>) {
+        <span class="kw">for</span> <span class="kw-2">&amp;</span>(_, <span class="kw-2">ref</span> <span class="ident">ty</span>, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fields</span> {
+            <span class="ident">ty</span>.<span class="ident">add_dependencies_ignoring_generics</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">generic_params</span>, <span class="ident">library</span>, <span class="ident">out</span>);
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">instantiate_monomorph</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">generic_values</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span>, <span class="ident">library</span>: <span class="kw-2">&amp;</span><span class="ident">Library</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Monomorphs</span>) {
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">generic_params</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span>
+                <span class="self">self</span>.<span class="ident">generic_params</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">generic_values</span>.<span class="ident">len</span>());
+
+        <span class="kw">let</span> <span class="ident">mappings</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">generic_params</span>.<span class="ident">iter</span>()
+                                          .<span class="ident">zip</span>(<span class="ident">generic_values</span>.<span class="ident">iter</span>())
+                                          .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>();
+
+        <span class="kw">let</span> <span class="ident">monomorph</span> <span class="op">=</span> <span class="ident">Struct</span> {
+            <span class="ident">name</span>: <span class="ident">mangle</span>::<span class="ident">mangle_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>, <span class="ident">generic_values</span>),
+            <span class="ident">generic_params</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+            <span class="ident">fields</span>: <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>()
+                               .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="ident">x</span>.<span class="number">0</span>.<span class="ident">clone</span>(), <span class="ident">x</span>.<span class="number">1</span>.<span class="ident">specialize</span>(<span class="kw-2">&amp;</span><span class="ident">mappings</span>), <span class="ident">x</span>.<span class="number">2</span>.<span class="ident">clone</span>()))
+                               .<span class="ident">collect</span>(),
+            <span class="ident">tuple_struct</span>: <span class="self">self</span>.<span class="ident">tuple_struct</span>,
+            <span class="ident">cfg</span>: <span class="self">self</span>.<span class="ident">cfg</span>.<span class="ident">clone</span>(),
+            <span class="ident">annotations</span>: <span class="self">self</span>.<span class="ident">annotations</span>.<span class="ident">clone</span>(),
+            <span class="ident">documentation</span>: <span class="self">self</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>(),
+        };
+
+        <span class="comment">// Instantiate any monomorphs for any generic paths we may have just created.</span>
+        <span class="ident">monomorph</span>.<span class="ident">add_monomorphs</span>(<span class="ident">library</span>, <span class="ident">out</span>);
+
+        <span class="ident">out</span>.<span class="ident">insert_struct</span>(<span class="self">self</span>, <span class="ident">monomorph</span>, <span class="ident">generic_values</span>.<span class="ident">clone</span>());
+    }
+
+    <span class="kw">fn</span> <span class="ident">specialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, _: <span class="kw-2">&amp;</span><span class="ident">Library</span>, <span class="ident">aliasee</span>: <span class="kw-2">&amp;</span><span class="ident">Specialization</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">aliasee</span>.<span class="ident">aliased</span>.<span class="ident">generics</span>.<span class="ident">len</span>() <span class="op">!=</span>
+           <span class="self">self</span>.<span class="ident">generic_params</span>.<span class="ident">len</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Incomplete specialization, the amount of generics in the path doesn&#39;t match the amount of generics in the item.&quot;</span>.<span class="ident">to_owned</span>());
+        }
+
+        <span class="kw">let</span> <span class="ident">mappings</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">generic_params</span>.<span class="ident">iter</span>()
+                                          .<span class="ident">zip</span>(<span class="ident">aliasee</span>.<span class="ident">aliased</span>.<span class="ident">generics</span>.<span class="ident">iter</span>())
+                                          .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>();
+
+        <span class="prelude-val">Ok</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">Struct</span> {
+            <span class="ident">name</span>: <span class="ident">aliasee</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
+            <span class="ident">generic_params</span>: <span class="ident">aliasee</span>.<span class="ident">generic_params</span>.<span class="ident">clone</span>(),
+            <span class="ident">fields</span>: <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>()
+                                  .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="ident">x</span>.<span class="number">0</span>.<span class="ident">clone</span>(), <span class="ident">x</span>.<span class="number">1</span>.<span class="ident">specialize</span>(<span class="kw-2">&amp;</span><span class="ident">mappings</span>), <span class="ident">x</span>.<span class="number">2</span>.<span class="ident">clone</span>()))
+                                  .<span class="ident">collect</span>(),
+            <span class="ident">tuple_struct</span>: <span class="self">self</span>.<span class="ident">tuple_struct</span>,
+            <span class="ident">cfg</span>: <span class="ident">aliasee</span>.<span class="ident">cfg</span>.<span class="ident">clone</span>(),
+            <span class="ident">annotations</span>: <span class="ident">aliasee</span>.<span class="ident">annotations</span>.<span class="ident">clone</span>(),
+            <span class="ident">documentation</span>: <span class="ident">aliasee</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>(),
+        }))
     }
 }
 

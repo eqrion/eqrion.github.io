@@ -190,9 +190,6 @@
 <span id="145">145</span>
 <span id="146">146</span>
 <span id="147">147</span>
-<span id="148">148</span>
-<span id="149">149</span>
-<span id="150">150</span>
 </pre><pre class="rust ">
 <span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -200,8 +197,9 @@
 
 <span class="kw">use</span> <span class="ident">syn</span>;
 
-<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">ir</span>::{<span class="ident">AnnotationSet</span>, <span class="ident">Cfg</span>, <span class="ident">Documentation</span>, <span class="ident">Enum</span>};
-<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">ir</span>::{<span class="ident">GenericPath</span>, <span class="ident">Item</span>, <span class="ident">OpaqueItem</span>, <span class="ident">PrimitiveType</span>, <span class="ident">Struct</span>, <span class="ident">Typedef</span>};
+<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">dependencies</span>::<span class="ident">Dependencies</span>;
+<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">ir</span>::{<span class="ident">AnnotationSet</span>, <span class="ident">Cfg</span>, <span class="ident">Documentation</span>};
+<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">ir</span>::{<span class="ident">GenericPath</span>, <span class="ident">ItemContainer</span>, <span class="ident">Item</span>, <span class="ident">PrimitiveType</span>};
 <span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">library</span>::<span class="ident">Library</span>;
 
 <span class="doccomment">/// A type alias that generates a copy of its aliasee with a new name. If the type</span>
@@ -233,7 +231,7 @@
                 <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">GenericPath</span>::<span class="ident">load</span>(<span class="ident">p</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">if</span> <span class="ident">PrimitiveType</span>::<span class="ident">maybe</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>.<span class="ident">name</span>).<span class="ident">is_some</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;can&#39;t specialize a primitive&quot;</span>));
+                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Definition is a primitive, which cannot be specialized.&quot;</span>.<span class="ident">to_owned</span>());
                 }
 
                 <span class="prelude-val">Ok</span>(<span class="ident">Specialization</span> {
@@ -246,102 +244,98 @@
                 })
             }
             _ <span class="op">=&gt;</span> {
-                <span class="prelude-val">Err</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;not a path&quot;</span>))
+                <span class="prelude-val">Err</span>(<span class="string">&quot;Definition is not a path.&quot;</span>.<span class="ident">to_owned</span>())
             }
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">specialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">library</span>: <span class="kw-2">&amp;</span><span class="ident">Library</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">items</span>) <span class="op">=</span> <span class="ident">library</span>.<span class="ident">get_item</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">aliased</span>.<span class="ident">name</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resolve_specialization</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">library</span>: <span class="kw-2">&amp;</span><span class="ident">Library</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">items</span>) <span class="op">=</span> <span class="ident">library</span>.<span class="ident">get_items</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">aliased</span>.<span class="ident">name</span>) {
             <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">items</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>);
 
             <span class="kw">if</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;specializing an aliased type with multiple definitions&quot;</span>);
+                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Specializing an aliased type with multiple definitions is possible but unsupported currently.&quot;</span>);
             }
 
             <span class="kw">match</span> <span class="ident">items</span>[<span class="number">0</span>] {
-                <span class="ident">Item</span>::<span class="ident">OpaqueItem</span>(<span class="kw-2">ref</span> <span class="ident">aliased</span>) <span class="op">=&gt;</span> {
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">aliased</span>.<span class="ident">generics</span>.<span class="ident">len</span>() <span class="op">!=</span>
-                       <span class="ident">aliased</span>.<span class="ident">generic_params</span>.<span class="ident">len</span>() {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;incomplete specialization&quot;</span>));
-                    }
-
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Item</span>::<span class="ident">OpaqueItem</span>(<span class="ident">OpaqueItem</span> {
-                        <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">generic_params</span>: <span class="self">self</span>.<span class="ident">generic_params</span>.<span class="ident">clone</span>(),
-                        <span class="ident">cfg</span>: <span class="self">self</span>.<span class="ident">cfg</span>.<span class="ident">clone</span>(),
-                        <span class="ident">annotations</span>: <span class="self">self</span>.<span class="ident">annotations</span>.<span class="ident">clone</span>(),
-                        <span class="ident">documentation</span>: <span class="self">self</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>(),
-                    })))
+                <span class="ident">ItemContainer</span>::<span class="ident">Constant</span>(..) <span class="op">=&gt;</span> {
+                    <span class="macro">unreachable</span><span class="macro">!</span>()
                 }
-                <span class="ident">Item</span>::<span class="ident">Struct</span>(<span class="kw-2">ref</span> <span class="ident">aliased</span>) <span class="op">=&gt;</span> {
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">aliased</span>.<span class="ident">generics</span>.<span class="ident">len</span>() <span class="op">!=</span>
-                       <span class="ident">aliased</span>.<span class="ident">generic_params</span>.<span class="ident">len</span>() {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;incomplete specialization&quot;</span>));
-                    }
-
-                    <span class="kw">let</span> <span class="ident">mappings</span> <span class="op">=</span> <span class="ident">aliased</span>.<span class="ident">generic_params</span>.<span class="ident">iter</span>()
-                                                         .<span class="ident">zip</span>(<span class="self">self</span>.<span class="ident">aliased</span>.<span class="ident">generics</span>.<span class="ident">iter</span>())
-                                                         .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>();
-
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Item</span>::<span class="ident">Struct</span>(<span class="ident">Struct</span> {
-                        <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">generic_params</span>: <span class="self">self</span>.<span class="ident">generic_params</span>.<span class="ident">clone</span>(),
-                        <span class="ident">fields</span>: <span class="ident">aliased</span>.<span class="ident">fields</span>.<span class="ident">iter</span>()
-                                              .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="ident">x</span>.<span class="number">0</span>.<span class="ident">clone</span>(), <span class="ident">x</span>.<span class="number">1</span>.<span class="ident">specialize</span>(<span class="kw-2">&amp;</span><span class="ident">mappings</span>), <span class="ident">x</span>.<span class="number">2</span>.<span class="ident">clone</span>()))
-                                              .<span class="ident">collect</span>(),
-                        <span class="ident">tuple_struct</span>: <span class="ident">aliased</span>.<span class="ident">tuple_struct</span>,
-                        <span class="ident">cfg</span>: <span class="self">self</span>.<span class="ident">cfg</span>.<span class="ident">clone</span>(),
-                        <span class="ident">annotations</span>: <span class="self">self</span>.<span class="ident">annotations</span>.<span class="ident">clone</span>(),
-                        <span class="ident">documentation</span>: <span class="self">self</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>(),
-                    })))
+                <span class="ident">ItemContainer</span>::<span class="ident">Static</span>(..) <span class="op">=&gt;</span> {
+                    <span class="macro">unreachable</span><span class="macro">!</span>()
                 }
-                <span class="ident">Item</span>::<span class="ident">Enum</span>(<span class="kw-2">ref</span> <span class="ident">aliased</span>) <span class="op">=&gt;</span> {
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Item</span>::<span class="ident">Enum</span>(<span class="ident">Enum</span> {
-                        <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">repr</span>: <span class="ident">aliased</span>.<span class="ident">repr</span>.<span class="ident">clone</span>(),
-                        <span class="ident">values</span>: <span class="ident">aliased</span>.<span class="ident">values</span>.<span class="ident">clone</span>(),
-                        <span class="ident">cfg</span>: <span class="self">self</span>.<span class="ident">cfg</span>.<span class="ident">clone</span>(),
-                        <span class="ident">annotations</span>: <span class="self">self</span>.<span class="ident">annotations</span>.<span class="ident">clone</span>(),
-                        <span class="ident">documentation</span>: <span class="self">self</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>(),
-                    })))
+                <span class="ident">ItemContainer</span>::<span class="ident">OpaqueItem</span>(<span class="kw-2">ref</span> <span class="ident">aliased</span>) <span class="op">=&gt;</span> {
+                    <span class="ident">aliased</span>.<span class="ident">specialize</span>(<span class="ident">library</span>, <span class="self">self</span>)
                 }
-                <span class="ident">Item</span>::<span class="ident">Typedef</span>(<span class="kw-2">ref</span> <span class="ident">aliased</span>) <span class="op">=&gt;</span> {
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Item</span>::<span class="ident">Typedef</span>(<span class="ident">Typedef</span> {
-                        <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">aliased</span>: <span class="ident">aliased</span>.<span class="ident">aliased</span>.<span class="ident">clone</span>(),
-                        <span class="ident">cfg</span>: <span class="self">self</span>.<span class="ident">cfg</span>.<span class="ident">clone</span>(),
-                        <span class="ident">annotations</span>: <span class="self">self</span>.<span class="ident">annotations</span>.<span class="ident">clone</span>(),
-                        <span class="ident">documentation</span>: <span class="self">self</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>(),
-                    })))
+                <span class="ident">ItemContainer</span>::<span class="ident">Struct</span>(<span class="kw-2">ref</span> <span class="ident">aliased</span>) <span class="op">=&gt;</span> {
+                    <span class="ident">aliased</span>.<span class="ident">specialize</span>(<span class="ident">library</span>, <span class="self">self</span>)
                 }
-                <span class="ident">Item</span>::<span class="ident">Specialization</span>(<span class="kw-2">ref</span> <span class="ident">aliased</span>) <span class="op">=&gt;</span> {
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">aliased</span>.<span class="ident">generics</span>.<span class="ident">len</span>() <span class="op">!=</span>
-                       <span class="ident">aliased</span>.<span class="ident">generic_params</span>.<span class="ident">len</span>() {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;incomplete specialization&quot;</span>));
-                    }
-
-                    <span class="kw">let</span> <span class="ident">mappings</span> <span class="op">=</span> <span class="ident">aliased</span>.<span class="ident">generic_params</span>.<span class="ident">iter</span>()
-                                                         .<span class="ident">zip</span>(<span class="self">self</span>.<span class="ident">aliased</span>.<span class="ident">generics</span>.<span class="ident">iter</span>())
-                                                         .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>();
-
-                    <span class="kw">let</span> <span class="ident">generics</span> <span class="op">=</span> <span class="ident">aliased</span>.<span class="ident">aliased</span>.<span class="ident">generics</span>.<span class="ident">iter</span>()
-                                                           .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">specialize</span>(<span class="kw-2">&amp;</span><span class="ident">mappings</span>))
-                                                           .<span class="ident">collect</span>();
-
-                    <span class="ident">Specialization</span> {
-                        <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">generic_params</span>: <span class="self">self</span>.<span class="ident">generic_params</span>.<span class="ident">clone</span>(),
-                        <span class="ident">aliased</span>: <span class="ident">GenericPath</span>::<span class="ident">new</span>(<span class="ident">aliased</span>.<span class="ident">aliased</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">generics</span>),
-                        <span class="ident">cfg</span>: <span class="self">self</span>.<span class="ident">cfg</span>.<span class="ident">clone</span>(),
-                        <span class="ident">annotations</span>: <span class="self">self</span>.<span class="ident">annotations</span>.<span class="ident">clone</span>(),
-                        <span class="ident">documentation</span>: <span class="self">self</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>(),
-                    }.<span class="ident">specialize</span>(<span class="ident">library</span>)
+                <span class="ident">ItemContainer</span>::<span class="ident">Union</span>(<span class="kw-2">ref</span> <span class="ident">aliased</span>) <span class="op">=&gt;</span> {
+                    <span class="ident">aliased</span>.<span class="ident">specialize</span>(<span class="ident">library</span>, <span class="self">self</span>)
+                }
+                <span class="ident">ItemContainer</span>::<span class="ident">Enum</span>(<span class="kw-2">ref</span> <span class="ident">aliased</span>) <span class="op">=&gt;</span> {
+                    <span class="ident">aliased</span>.<span class="ident">specialize</span>(<span class="ident">library</span>, <span class="self">self</span>)
+                }
+                <span class="ident">ItemContainer</span>::<span class="ident">Typedef</span>(<span class="kw-2">ref</span> <span class="ident">aliased</span>) <span class="op">=&gt;</span> {
+                    <span class="ident">aliased</span>.<span class="ident">specialize</span>(<span class="ident">library</span>, <span class="self">self</span>)
+                }
+                <span class="ident">ItemContainer</span>::<span class="ident">Specialization</span>(<span class="kw-2">ref</span> <span class="ident">aliased</span>) <span class="op">=&gt;</span> {
+                    <span class="ident">aliased</span>.<span class="ident">specialize</span>(<span class="ident">library</span>, <span class="self">self</span>)
                 }
             }
         } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;couldn&#39;t find aliased type&quot;</span>))
+            <span class="prelude-val">Err</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Couldn&#39;t find aliased type {:?} for specializing.&quot;</span>, <span class="self">self</span>.<span class="ident">aliased</span>))
         }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Item</span> <span class="kw">for</span> <span class="ident">Specialization</span> {
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">cfg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cfg</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">annotations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AnnotationSet</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">annotations</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">annotations_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AnnotationSet</span> {
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">annotations</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">container</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">ItemContainer</span> {
+        <span class="ident">ItemContainer</span>::<span class="ident">Specialization</span>(<span class="self">self</span>.<span class="ident">clone</span>())
+    }
+
+    <span class="kw">fn</span> <span class="ident">specialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">library</span>: <span class="kw-2">&amp;</span><span class="ident">Library</span>, <span class="ident">aliasee</span>: <span class="kw-2">&amp;</span><span class="ident">Specialization</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">aliasee</span>.<span class="ident">aliased</span>.<span class="ident">generics</span>.<span class="ident">len</span>() <span class="op">!=</span>
+           <span class="self">self</span>.<span class="ident">generic_params</span>.<span class="ident">len</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Incomplete specialization, the amount of generics in the path doesn&#39;t match the amount of generics in the item.&quot;</span>.<span class="ident">to_owned</span>());
+        }
+
+        <span class="kw">let</span> <span class="ident">mappings</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">generic_params</span>.<span class="ident">iter</span>()
+                                          .<span class="ident">zip</span>(<span class="ident">aliasee</span>.<span class="ident">aliased</span>.<span class="ident">generics</span>.<span class="ident">iter</span>())
+                                          .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>();
+
+        <span class="kw">let</span> <span class="ident">generics</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">aliased</span>.<span class="ident">generics</span>.<span class="ident">iter</span>()
+                                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">specialize</span>(<span class="kw-2">&amp;</span><span class="ident">mappings</span>))
+                                            .<span class="ident">collect</span>();
+
+        <span class="ident">Specialization</span> {
+            <span class="ident">name</span>: <span class="ident">aliasee</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
+            <span class="ident">generic_params</span>: <span class="ident">aliasee</span>.<span class="ident">generic_params</span>.<span class="ident">clone</span>(),
+            <span class="ident">aliased</span>: <span class="ident">GenericPath</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">aliased</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">generics</span>),
+            <span class="ident">cfg</span>: <span class="ident">aliasee</span>.<span class="ident">cfg</span>.<span class="ident">clone</span>(),
+            <span class="ident">annotations</span>: <span class="ident">aliasee</span>.<span class="ident">annotations</span>.<span class="ident">clone</span>(),
+            <span class="ident">documentation</span>: <span class="ident">aliasee</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>(),
+        }.<span class="ident">resolve_specialization</span>(<span class="ident">library</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">add_dependencies</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, _: <span class="kw-2">&amp;</span><span class="ident">Library</span>, _: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Dependencies</span>) {
+        <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;Specializations must be specialized before dependency gathering.&quot;</span>);
     }
 }
 </pre>

@@ -219,6 +219,13 @@
 <span id="174">174</span>
 <span id="175">175</span>
 <span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
 </pre><pre class="rust ">
 <span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -239,7 +246,7 @@
 }
 
 <span class="doccomment">/// A reference to a package including it&#39;s name and the specific version.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PackageRef</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">PackageRef</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">String</span>,
 }
@@ -288,11 +295,11 @@
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">binding_crate_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">binding_crate_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binding_crate_name</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">binding_crate_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">PackageRef</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">binding_crate_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">PackageRef</span> {
         <span class="self">self</span>.<span class="ident">find_pkg_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binding_crate_name</span>).<span class="ident">unwrap</span>()
     }
 
@@ -312,38 +319,42 @@
 
     <span class="doccomment">/// Finds the package reference for a dependency of a crate using</span>
     <span class="doccomment">/// `Cargo.lock`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_dep_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">package</span>: <span class="kw-2">&amp;</span><span class="ident">PackageRef</span>, <span class="ident">dependency_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PackageRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">find_dep_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">package</span>: <span class="kw-2">&amp;</span><span class="ident">PackageRef</span>, <span class="ident">dependency_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PackageRef</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">is_none</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
         <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
 
-        <span class="kw">if</span> <span class="ident">lock</span>.<span class="ident">root</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">package</span>.<span class="ident">name</span> <span class="op">&amp;&amp;</span>
-           <span class="ident">lock</span>.<span class="ident">root</span>.<span class="ident">version</span> <span class="op">==</span> <span class="ident">package</span>.<span class="ident">version</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">deps</span>) <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">root</span>.<span class="ident">dependencies</span> {
-                <span class="kw">for</span> <span class="ident">dep</span> <span class="kw">in</span> <span class="ident">deps</span> {
-                    <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">version</span>) <span class="op">=</span> <span class="ident">parse_dep_string</span>(<span class="ident">dep</span>);
+        <span class="comment">// the name in Cargo.lock could use &#39;-&#39; instead of &#39;_&#39;, so we need to</span>
+        <span class="comment">// look for that too.</span>
+        <span class="kw">let</span> <span class="ident">replaced_name</span> <span class="op">=</span> <span class="ident">dependency_name</span>.<span class="ident">replace</span>(<span class="string">&quot;_&quot;</span>, <span class="string">&quot;-&quot;</span>);
 
-                    <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="ident">dependency_name</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">PackageRef</span> {
-                            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_owned</span>(),
-                            <span class="ident">version</span>: <span class="ident">version</span>.<span class="ident">to_owned</span>(),
-                        });
+        <span class="kw">if</span> <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">root</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">lock</span>.<span class="ident">root</span> {
+            <span class="kw">if</span> <span class="ident">root</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">package</span>.<span class="ident">name</span> <span class="op">&amp;&amp;</span> <span class="ident">root</span>.<span class="ident">version</span> <span class="op">==</span> <span class="ident">package</span>.<span class="ident">version</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">deps</span>) <span class="op">=</span> <span class="ident">root</span>.<span class="ident">dependencies</span> {
+                    <span class="kw">for</span> <span class="ident">dep</span> <span class="kw">in</span> <span class="ident">deps</span> {
+                        <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">version</span>) <span class="op">=</span> <span class="ident">parse_dep_string</span>(<span class="ident">dep</span>);
+
+                        <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="ident">dependency_name</span> <span class="op">||</span> <span class="ident">name</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">replaced_name</span> {
+                            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">PackageRef</span> {
+                                <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_owned</span>(),
+                                <span class="ident">version</span>: <span class="ident">version</span>.<span class="ident">to_owned</span>(),
+                            });
+                        }
                     }
                 }
+                <span class="kw">return</span> <span class="prelude-val">None</span>;
             }
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">lock_packages</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">lock</span>.<span class="ident">package</span> {
             <span class="kw">for</span> <span class="ident">lock_package</span> <span class="kw">in</span> <span class="ident">lock_packages</span> {
-                <span class="kw">if</span> <span class="ident">lock_package</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">package</span>.<span class="ident">name</span> <span class="op">&amp;&amp;</span>
-                   <span class="ident">lock_package</span>.<span class="ident">version</span> <span class="op">==</span> <span class="ident">package</span>.<span class="ident">version</span> {
+                <span class="kw">if</span> <span class="ident">lock_package</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">package</span>.<span class="ident">name</span> <span class="op">&amp;&amp;</span> <span class="ident">lock_package</span>.<span class="ident">version</span> <span class="op">==</span> <span class="ident">package</span>.<span class="ident">version</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">deps</span>) <span class="op">=</span> <span class="ident">lock_package</span>.<span class="ident">dependencies</span> {
                         <span class="kw">for</span> <span class="ident">dep</span> <span class="kw">in</span> <span class="ident">deps</span> {
                             <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">version</span>) <span class="op">=</span> <span class="ident">parse_dep_string</span>(<span class="ident">dep</span>);
 
-                            <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="ident">dependency_name</span> {
+                            <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="ident">dependency_name</span> <span class="op">||</span> <span class="ident">name</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">replaced_name</span> {
                                 <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">PackageRef</span> {
                                     <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_owned</span>(),
                                     <span class="ident">version</span>: <span class="ident">version</span>.<span class="ident">to_owned</span>(),
@@ -359,7 +370,8 @@
     }
 
     <span class="doccomment">/// Finds the directory for a specified package reference.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_crate_dir</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">package</span>: <span class="kw-2">&amp;</span><span class="ident">PackageRef</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">find_crate_dir</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">package</span>: <span class="kw-2">&amp;</span><span class="ident">PackageRef</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">meta_package</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">metadata</span>.<span class="ident">packages</span> {
             <span class="kw">if</span> <span class="ident">meta_package</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">package</span>.<span class="ident">name</span> <span class="op">&amp;&amp;</span>
                <span class="ident">meta_package</span>.<span class="ident">version</span> <span class="op">==</span> <span class="ident">package</span>.<span class="ident">version</span> {
@@ -371,9 +383,10 @@
     }
 
     <span class="doccomment">/// Finds `src/lib.rs` for a specified package reference.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_crate_src</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">package</span>: <span class="kw-2">&amp;</span><span class="ident">PackageRef</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">find_crate_src</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">package</span>: <span class="kw-2">&amp;</span><span class="ident">PackageRef</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">kind_lib</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;lib&quot;</span>);
         <span class="kw">let</span> <span class="ident">kind_staticlib</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;staticlib&quot;</span>);
+        <span class="kw">let</span> <span class="ident">kind_rlib</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;rlib&quot;</span>);
         <span class="kw">let</span> <span class="ident">kind_cdylib</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;cdylib&quot;</span>);
 
         <span class="kw">for</span> <span class="ident">meta_package</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">metadata</span>.<span class="ident">packages</span> {
@@ -382,6 +395,7 @@
                 <span class="kw">for</span> <span class="ident">target</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">meta_package</span>.<span class="ident">targets</span> {
                     <span class="kw">if</span> <span class="ident">target</span>.<span class="ident">kind</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">kind_lib</span>) <span class="op">||</span>
                        <span class="ident">target</span>.<span class="ident">kind</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">kind_staticlib</span>) <span class="op">||</span>
+                       <span class="ident">target</span>.<span class="ident">kind</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">kind_rlib</span>) <span class="op">||</span>
                        <span class="ident">target</span>.<span class="ident">kind</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">kind_cdylib</span>) {
                         <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="ident">target</span>.<span class="ident">src_path</span>));
                     }
@@ -392,7 +406,7 @@
         <span class="prelude-val">None</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expand_crate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">package</span>: <span class="kw-2">&amp;</span><span class="ident">PackageRef</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">expand_crate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">package</span>: <span class="kw-2">&amp;</span><span class="ident">PackageRef</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="ident">cargo_expand</span>::<span class="ident">expand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">manifest_path</span>, <span class="kw-2">&amp;</span><span class="ident">package</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">package</span>.<span class="ident">version</span>)
     }
 }
