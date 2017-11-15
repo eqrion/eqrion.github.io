@@ -77,11 +77,6 @@
 <span id="32">32</span>
 <span id="33">33</span>
 <span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
-<span id="38">38</span>
-<span id="39">39</span>
 </pre><pre class="rust ">
 <span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -113,13 +108,8 @@
 <span class="doccomment">/// A utility function for build scripts to generate bindings for a crate with a</span>
 <span class="doccomment">/// custom config.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_with_config</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;&gt;</span>(<span class="ident">crate_dir</span>: <span class="ident">P</span>, <span class="ident">config</span>: <span class="ident">Config</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bindings</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">cargo</span> <span class="op">=</span> <span class="ident">Cargo</span>::<span class="ident">load</span>(<span class="ident">crate_dir</span>.<span class="ident">as_ref</span>(),
-                            <span class="prelude-val">None</span>,
-                            <span class="ident">config</span>.<span class="ident">parse</span>.<span class="ident">parse_deps</span>)<span class="question-mark">?</span>;
-
     <span class="ident">Builder</span>::<span class="ident">new</span>().<span class="ident">with_config</span>(<span class="ident">config</span>)
-                  .<span class="ident">with_std_types</span>()
-                  .<span class="ident">with_crate</span>(<span class="ident">cargo</span>)
+                  .<span class="ident">with_crate</span>(<span class="ident">crate_dir</span>)
                   .<span class="ident">generate</span>()
 }
 </pre>

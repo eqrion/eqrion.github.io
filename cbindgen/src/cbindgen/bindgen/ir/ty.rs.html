@@ -599,10 +599,6 @@
 <span id="554">554</span>
 <span id="555">555</span>
 <span id="556">556</span>
-<span id="557">557</span>
-<span id="558">558</span>
-<span id="559">559</span>
-<span id="560">560</span>
 </pre><pre class="rust ">
 <span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -651,7 +647,6 @@
     <span class="ident">Float</span>,
     <span class="ident">Double</span>,
     <span class="ident">SizeT</span>,
-    <span class="ident">Str</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">PrimitiveType</span> {
@@ -686,7 +681,6 @@
             <span class="string">&quot;f32&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">PrimitiveType</span>::<span class="ident">Float</span>),
             <span class="string">&quot;f64&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">PrimitiveType</span>::<span class="ident">Double</span>),
             <span class="string">&quot;size_t&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">PrimitiveType</span>::<span class="ident">SizeT</span>),
-            <span class="string">&quot;str&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">PrimitiveType</span>::<span class="ident">Str</span>),
             _ <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
         }
     }
@@ -720,7 +714,6 @@
             <span class="kw-2">&amp;</span><span class="ident">PrimitiveType</span>::<span class="ident">Float</span> <span class="op">=&gt;</span> <span class="string">&quot;f32&quot;</span>,
             <span class="kw-2">&amp;</span><span class="ident">PrimitiveType</span>::<span class="ident">Double</span> <span class="op">=&gt;</span> <span class="string">&quot;f64&quot;</span>,
             <span class="kw-2">&amp;</span><span class="ident">PrimitiveType</span>::<span class="ident">SizeT</span> <span class="op">=&gt;</span> <span class="string">&quot;size_t&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="ident">PrimitiveType</span>::<span class="ident">Str</span> <span class="op">=&gt;</span> <span class="string">&quot;str&quot;</span>,
         }
     }
 
@@ -753,7 +746,6 @@
             <span class="kw-2">&amp;</span><span class="ident">PrimitiveType</span>::<span class="ident">Float</span> <span class="op">=&gt;</span> <span class="string">&quot;float&quot;</span>,
             <span class="kw-2">&amp;</span><span class="ident">PrimitiveType</span>::<span class="ident">Double</span> <span class="op">=&gt;</span> <span class="string">&quot;double&quot;</span>,
             <span class="kw-2">&amp;</span><span class="ident">PrimitiveType</span>::<span class="ident">SizeT</span> <span class="op">=&gt;</span> <span class="string">&quot;size_t&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="ident">PrimitiveType</span>::<span class="ident">Str</span> <span class="op">=&gt;</span> <span class="string">&quot;char&quot;</span>,
         }
     }
 

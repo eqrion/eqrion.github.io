@@ -226,6 +226,11 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
 </pre><pre class="rust ">
 <span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -253,7 +258,7 @@
 
 <span class="doccomment">/// A collection of metadata for a library from cargo.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Cargo</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Cargo</span> {
     <span class="ident">manifest_path</span>: <span class="ident">PathBuf</span>,
     <span class="ident">binding_crate_name</span>: <span class="ident">String</span>,
 
@@ -265,15 +270,20 @@
     <span class="doccomment">/// Gather metadata from cargo for a specific library and binding crate</span>
     <span class="doccomment">/// name. If dependency finding isn&#39;t needed then Cargo.lock files don&#39;t</span>
     <span class="doccomment">/// need to be parsed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">crate_dir</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
-                <span class="ident">binding_crate_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-                <span class="ident">use_cargo_lock</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cargo</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">crate_dir</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
+                       <span class="ident">binding_crate_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+                       <span class="ident">use_cargo_lock</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cargo</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">toml_path</span> <span class="op">=</span> <span class="ident">crate_dir</span>.<span class="ident">join</span>(<span class="string">&quot;Cargo.toml&quot;</span>);
         <span class="kw">let</span> <span class="ident">lock_path</span> <span class="op">=</span> <span class="ident">crate_dir</span>.<span class="ident">join</span>(<span class="string">&quot;Cargo.lock&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">use_cargo_lock</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">cargo_lock</span>::<span class="ident">lock</span>(<span class="kw-2">&amp;</span><span class="ident">lock_path</span>)
-                            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;couldn&#39;t load {:?}: {:?}&quot;</span>, <span class="ident">lock_path</span>, <span class="ident">x</span>))<span class="question-mark">?</span>)
+            <span class="kw">match</span> <span class="ident">cargo_lock</span>::<span class="ident">lock</span>(<span class="kw-2">&amp;</span><span class="ident">lock_path</span>) {
+                <span class="prelude-val">Ok</span>(<span class="ident">lock</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">lock</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">x</span>) <span class="op">=&gt;</span> {
+                    <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;couldn&#39;t load lock file {:?}: {:?}&quot;</span>, <span class="ident">lock_path</span>, <span class="ident">x</span>);
+                    <span class="prelude-val">None</span>
+                }
+            }
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         };
