@@ -268,6 +268,8 @@
 <span id="223">223</span>
 <span id="224">224</span>
 <span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
 </pre><pre class="rust ">
 <span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -277,7 +279,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Write</span>;
 
-<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">config</span>::{<span class="ident">Config</span>, <span class="ident">Braces</span>};
+<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">config</span>::{<span class="ident">Braces</span>, <span class="ident">Config</span>};
 
 <span class="doccomment">/// A type of way to format a list.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ListType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -296,6 +298,34 @@
     }
     <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(())
+    }
+}
+
+<span class="doccomment">/// A utility wrapper to write unbuffered data and correctly adjust positions.</span>
+<span class="kw">struct</span> <span class="ident">InnerWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>: <span class="lifetime">&#39;a</span>, <span class="ident">F</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Write</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">SourceWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">F</span><span class="op">&gt;</span>);
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">F</span>: <span class="ident">Write</span><span class="op">&gt;</span> <span class="ident">Write</span> <span class="kw">for</span> <span class="ident">InnerWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">F</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">writer</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>;
+
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">writer</span>.<span class="ident">line_started</span> {
+            <span class="kw">for</span> _ <span class="kw">in</span> <span class="number">0</span>..<span class="ident">writer</span>.<span class="ident">spaces</span>() {
+                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>.<span class="ident">out</span>, <span class="string">&quot; &quot;</span>).<span class="ident">unwrap</span>();
+            }
+            <span class="ident">writer</span>.<span class="ident">line_started</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class="ident">writer</span>.<span class="ident">line_length</span> <span class="op">+=</span> <span class="ident">writer</span>.<span class="ident">spaces</span>();
+        }
+
+        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">buf</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;\n&#39;</span>));
+
+        <span class="kw">let</span> <span class="ident">written</span> <span class="op">=</span> <span class="ident">writer</span>.<span class="ident">out</span>.<span class="ident">write</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
+        <span class="ident">writer</span>.<span class="ident">line_length</span> <span class="op">+=</span> <span class="ident">written</span>;
+        <span class="ident">writer</span>.<span class="ident">max_line_length</span> <span class="op">=</span> <span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">writer</span>.<span class="ident">max_line_length</span>, <span class="ident">writer</span>.<span class="ident">line_length</span>);
+        <span class="prelude-val">Ok</span>(<span class="ident">written</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">out</span>.<span class="ident">flush</span>()
     }
 }
 
@@ -327,7 +357,8 @@
     <span class="doccomment">/// Takes a function that writes source and returns the maximum line length</span>
     <span class="doccomment">/// written.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">measure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="ident">usize</span>
-        <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MeasureWriter</span>)
+    <span class="kw">where</span>
+        <span class="ident">T</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MeasureWriter</span>),
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">measurer</span> <span class="op">=</span> <span class="ident">SourceWriter</span> {
             <span class="ident">out</span>: <span class="ident">NullFile</span>,
@@ -361,9 +392,8 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_tab</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">spaces</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">spaces</span>() <span class="op">-</span>
-                     (<span class="self">self</span>.<span class="ident">spaces</span>() <span class="op">%</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">tab_width</span>) <span class="op">+</span> 
-                     <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">tab_width</span>;
+        <span class="kw">let</span> <span class="ident">spaces</span> <span class="op">=</span>
+            <span class="self">self</span>.<span class="ident">spaces</span>() <span class="op">-</span> (<span class="self">self</span>.<span class="ident">spaces</span>() <span class="op">%</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">tab_width</span>) <span class="op">+</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">tab_width</span>;
         <span class="self">self</span>.<span class="ident">spaces</span>.<span class="ident">push</span>(<span class="ident">spaces</span>);
     }
 
@@ -411,75 +441,49 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">line_started</span> {
-            <span class="kw">for</span> _ <span class="kw">in</span> <span class="number">0</span>..<span class="self">self</span>.<span class="ident">spaces</span>() {
-                <span class="macro">write</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">out</span>, <span class="string">&quot; &quot;</span>).<span class="ident">unwrap</span>();
-            }
-            <span class="self">self</span>.<span class="ident">line_started</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="self">self</span>.<span class="ident">line_length</span> <span class="op">+=</span> <span class="self">self</span>.<span class="ident">spaces</span>();
-        }
-
-        <span class="macro">write</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">out</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">text</span>).<span class="ident">unwrap</span>();
-        <span class="self">self</span>.<span class="ident">line_length</span> <span class="op">+=</span> <span class="ident">text</span>.<span class="ident">len</span>();
-        <span class="self">self</span>.<span class="ident">max_line_length</span> <span class="op">=</span> <span class="ident">cmp</span>::<span class="ident">max</span>(<span class="self">self</span>.<span class="ident">max_line_length</span>, <span class="self">self</span>.<span class="ident">line_length</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
+        <span class="macro">write</span><span class="macro">!</span>(<span class="self">self</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">text</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_horizontal_source_list</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">S</span>: <span class="ident">Source</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">items</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">list_type</span>: <span class="ident">ListType</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">fmt</span>: ::<span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Arguments</span>) {
+        <span class="ident">InnerWriter</span>(<span class="self">self</span>).<span class="ident">write_fmt</span>(<span class="ident">fmt</span>).<span class="ident">unwrap</span>();
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_horizontal_source_list</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">S</span>: <span class="ident">Source</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">items</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+        <span class="ident">list_type</span>: <span class="ident">ListType</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
+    ) {
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">ref</span> <span class="ident">item</span>) <span class="kw">in</span> <span class="ident">items</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
             <span class="ident">item</span>.<span class="ident">write</span>(<span class="self">self</span>.<span class="ident">config</span>, <span class="self">self</span>);
 
             <span class="kw">match</span> <span class="ident">list_type</span> {
-                <span class="ident">ListType</span>::<span class="ident">Join</span>(<span class="ident">text</span>) <span class="op">=&gt;</span> {
-                    <span class="kw">if</span> <span class="ident">i</span> <span class="op">!=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span> {
-                        <span class="self">self</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">text</span>);
-                    }
-                }
+                <span class="ident">ListType</span>::<span class="ident">Join</span>(<span class="ident">text</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">!=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span> {
+                    <span class="macro">write</span><span class="macro">!</span>(<span class="self">self</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">text</span>);
+                },
                 <span class="ident">ListType</span>::<span class="ident">Cap</span>(<span class="ident">text</span>) <span class="op">=&gt;</span> {
-                    <span class="self">self</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">text</span>);
+                    <span class="macro">write</span><span class="macro">!</span>(<span class="self">self</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">text</span>);
                 }
             }
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_vertical_list</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">items</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">list_type</span>: <span class="ident">ListType</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">align_length</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">line_length_for_align</span>();
-        <span class="self">self</span>.<span class="ident">push_set_spaces</span>(<span class="ident">align_length</span>);
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">item</span>) <span class="kw">in</span> <span class="ident">items</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="self">self</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>);
-
-            <span class="kw">match</span> <span class="ident">list_type</span> {
-                <span class="ident">ListType</span>::<span class="ident">Join</span>(<span class="ident">text</span>) <span class="op">=&gt;</span> {
-                    <span class="kw">if</span> <span class="ident">i</span> <span class="op">!=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span> {
-                        <span class="self">self</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">text</span>);
-                    }
-                }
-                <span class="ident">ListType</span>::<span class="ident">Cap</span>(<span class="ident">text</span>) <span class="op">=&gt;</span> {
-                    <span class="self">self</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">text</span>);
-                }
-            }
-
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">!=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span> {
-                <span class="self">self</span>.<span class="ident">new_line</span>();
-            }
-        }
-        <span class="self">self</span>.<span class="ident">pop_tab</span>();
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_vertical_source_list</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">S</span>: <span class="ident">Source</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">items</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">list_type</span>: <span class="ident">ListType</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_vertical_source_list</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">S</span>: <span class="ident">Source</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">items</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+        <span class="ident">list_type</span>: <span class="ident">ListType</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
+    ) {
         <span class="kw">let</span> <span class="ident">align_length</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">line_length_for_align</span>();
         <span class="self">self</span>.<span class="ident">push_set_spaces</span>(<span class="ident">align_length</span>);
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">ref</span> <span class="ident">item</span>) <span class="kw">in</span> <span class="ident">items</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
             <span class="ident">item</span>.<span class="ident">write</span>(<span class="self">self</span>.<span class="ident">config</span>, <span class="self">self</span>);
 
             <span class="kw">match</span> <span class="ident">list_type</span> {
-                <span class="ident">ListType</span>::<span class="ident">Join</span>(<span class="ident">text</span>) <span class="op">=&gt;</span> {
-                    <span class="kw">if</span> <span class="ident">i</span> <span class="op">!=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span> {
-                        <span class="self">self</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">text</span>);
-                    }
-                }
+                <span class="ident">ListType</span>::<span class="ident">Join</span>(<span class="ident">text</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">!=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span> {
+                    <span class="macro">write</span><span class="macro">!</span>(<span class="self">self</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">text</span>);
+                },
                 <span class="ident">ListType</span>::<span class="ident">Cap</span>(<span class="ident">text</span>) <span class="op">=&gt;</span> {
-                    <span class="self">self</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">text</span>);
+                    <span class="macro">write</span><span class="macro">!</span>(<span class="self">self</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">text</span>);
                 }
             }
 
@@ -512,13 +516,15 @@
                     <dd>Show this help dialog</dd>
                     <dt>S</dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt>↑</dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt>↓</dt>
                     <dd>Move down in search results</dd>
+                    <dt>↹</dt>
+                    <dd>Switch tab</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
+                    <dt style="width:31px;">+ / -</dt>
                     <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>

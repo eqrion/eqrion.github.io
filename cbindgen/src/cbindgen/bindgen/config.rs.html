@@ -445,9 +445,6 @@
 <span id="400">400</span>
 <span id="401">401</span>
 <span id="402">402</span>
-<span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
 </pre><pre class="rust ">
 <span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -597,8 +594,6 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StructConfig</span> {
     <span class="doccomment">/// The rename rule to apply to the name of struct fields</span>
     <span class="kw">pub</span> <span class="ident">rename_fields</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RenameRule</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether to generate helper template specialization for generics</span>
-    <span class="kw">pub</span> <span class="ident">generic_template_specialization</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Whether to generate a piecewise equality operator</span>
     <span class="kw">pub</span> <span class="ident">derive_eq</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Whether to generate a piecewise inequality operator</span>
@@ -617,7 +612,6 @@
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="ident">StructConfig</span> {
         <span class="ident">StructConfig</span> {
             <span class="ident">rename_fields</span>: <span class="prelude-val">None</span>,
-            <span class="ident">generic_template_specialization</span>: <span class="bool-val">true</span>,
             <span class="ident">derive_eq</span>: <span class="bool-val">false</span>,
             <span class="ident">derive_neq</span>: <span class="bool-val">false</span>,
             <span class="ident">derive_lt</span>: <span class="bool-val">false</span>,
@@ -720,7 +714,7 @@
 }
 
 <span class="doccomment">/// Settings to apply when parsing.</span>
-<span class="attribute">#[<span class="ident">derive</span>( <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;snake_case&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
@@ -872,13 +866,15 @@
                     <dd>Show this help dialog</dd>
                     <dt>S</dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt>↑</dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt>↓</dt>
                     <dd>Move down in search results</dd>
+                    <dt>↹</dt>
+                    <dd>Switch tab</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
+                    <dt style="width:31px;">+ / -</dt>
                     <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>

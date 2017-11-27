@@ -248,12 +248,6 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
 </pre><pre class="rust ">
 <span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -264,10 +258,9 @@
 <span class="kw">use</span> <span class="ident">syn</span>;
 
 <span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">config</span>::{<span class="ident">Config</span>, <span class="ident">Language</span>};
-<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">ir</span>::{<span class="ident">AnnotationSet</span>, <span class="ident">Cfg</span>, <span class="ident">CfgWrite</span>, <span class="ident">Documentation</span>, <span class="ident">ItemContainer</span>, <span class="ident">Item</span>, <span class="ident">Repr</span>, <span class="ident">Specialization</span>};
-<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">library</span>::<span class="ident">Library</span>;
+<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">ir</span>::{<span class="ident">AnnotationSet</span>, <span class="ident">Cfg</span>, <span class="ident">CfgWrite</span>, <span class="ident">Documentation</span>, <span class="ident">Item</span>, <span class="ident">ItemContainer</span>, <span class="ident">Repr</span>};
 <span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">rename</span>::{<span class="ident">IdentifierType</span>, <span class="ident">RenameRule</span>};
-<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">utilities</span>::{<span class="ident">find_first_some</span>};
+<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">utilities</span>::<span class="ident">find_first_some</span>;
 <span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">writer</span>::{<span class="ident">Source</span>, <span class="ident">SourceWriter</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
@@ -281,22 +274,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Enum</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">name</span>: <span class="ident">String</span>,
-                <span class="ident">variants</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Variant</span><span class="op">&gt;</span>,
-                <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Attribute</span><span class="op">&gt;</span>,
-                <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Enum</span>, <span class="ident">String</span><span class="op">&gt;</span>
-    {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load</span>(
+        <span class="ident">name</span>: <span class="ident">String</span>,
+        <span class="ident">variants</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Variant</span><span class="op">&gt;</span>,
+        <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Attribute</span><span class="op">&gt;</span>,
+        <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Enum</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">repr</span> <span class="op">=</span> <span class="ident">Repr</span>::<span class="ident">load</span>(<span class="ident">attrs</span>);
 
-        <span class="kw">if</span> <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">C</span> <span class="op">&amp;&amp;</span>
-           <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">USize</span> <span class="op">&amp;&amp;</span>
-           <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">U32</span> <span class="op">&amp;&amp;</span>
-           <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">U16</span> <span class="op">&amp;&amp;</span>
-           <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">U8</span> <span class="op">&amp;&amp;</span>
-           <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">ISize</span> <span class="op">&amp;&amp;</span>
-           <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">I32</span> <span class="op">&amp;&amp;</span>
-           <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">I16</span> <span class="op">&amp;&amp;</span>
-           <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">I8</span> {
+        <span class="kw">if</span> <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">C</span> <span class="op">&amp;&amp;</span> <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">USize</span> <span class="op">&amp;&amp;</span> <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">U32</span> <span class="op">&amp;&amp;</span> <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">U16</span>
+            <span class="op">&amp;&amp;</span> <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">U8</span> <span class="op">&amp;&amp;</span> <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">ISize</span> <span class="op">&amp;&amp;</span> <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">I32</span>
+            <span class="op">&amp;&amp;</span> <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">I16</span> <span class="op">&amp;&amp;</span> <span class="ident">repr</span> <span class="op">!=</span> <span class="ident">Repr</span>::<span class="ident">I8</span>
+        {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Enum not marked with a valid repr(prim) or repr(C).&quot;</span>.<span class="ident">to_owned</span>());
         }
 
@@ -316,9 +305,11 @@
                         <span class="prelude-val">None</span> <span class="op">=&gt;</span> { <span class="comment">/* okay, we just use current */</span> }
                     }
 
-                    <span class="ident">values</span>.<span class="ident">push</span>((<span class="ident">variant</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>(),
-                                 <span class="ident">current</span>,
-                                 <span class="ident">Documentation</span>::<span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="ident">variant</span>.<span class="ident">attrs</span>)));
+                    <span class="ident">values</span>.<span class="ident">push</span>((
+                        <span class="ident">variant</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>(),
+                        <span class="ident">current</span>,
+                        <span class="ident">Documentation</span>::<span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="ident">variant</span>.<span class="ident">attrs</span>),
+                    ));
                     <span class="ident">current</span> <span class="op">=</span> <span class="ident">current</span> <span class="op">+</span> <span class="number">1</span>;
                 }
                 _ <span class="op">=&gt;</span> {
@@ -368,37 +359,34 @@
         <span class="ident">ItemContainer</span>::<span class="ident">Enum</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">specialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, _: <span class="kw-2">&amp;</span><span class="ident">Library</span>, <span class="ident">aliasee</span>: <span class="kw-2">&amp;</span><span class="ident">Specialization</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">Enum</span> {
-            <span class="ident">name</span>: <span class="ident">aliasee</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">repr</span>: <span class="self">self</span>.<span class="ident">repr</span>.<span class="ident">clone</span>(),
-            <span class="ident">values</span>: <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">clone</span>(),
-            <span class="ident">cfg</span>: <span class="ident">aliasee</span>.<span class="ident">cfg</span>.<span class="ident">clone</span>(),
-            <span class="ident">annotations</span>: <span class="ident">aliasee</span>.<span class="ident">annotations</span>.<span class="ident">clone</span>(),
-            <span class="ident">documentation</span>: <span class="ident">aliasee</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>(),
-        }))
-    }
-
     <span class="kw">fn</span> <span class="ident">rename_for_config</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) {
-        <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">enumeration</span>.<span class="ident">prefix_with_name</span> <span class="op">||</span>
-           <span class="self">self</span>.<span class="ident">annotations</span>.<span class="ident">bool</span>(<span class="string">&quot;prefix-with-name&quot;</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+        <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">language</span> <span class="op">==</span> <span class="ident">Language</span>::<span class="ident">C</span>
+            <span class="op">&amp;&amp;</span> (<span class="ident">config</span>.<span class="ident">enumeration</span>.<span class="ident">prefix_with_name</span>
+                <span class="op">||</span> <span class="self">self</span>.<span class="ident">annotations</span>.<span class="ident">bool</span>(<span class="string">&quot;prefix-with-name&quot;</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>))
         {
             <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">values</span>, <span class="ident">Vec</span>::<span class="ident">new</span>());
             <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">value</span>, <span class="ident">doc</span>) <span class="kw">in</span> <span class="ident">old</span> {
-                <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">push</span>((<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>, <span class="ident">name</span>), <span class="ident">value</span>, <span class="ident">doc</span>));
+                <span class="self">self</span>.<span class="ident">values</span>
+                    .<span class="ident">push</span>((<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>, <span class="ident">name</span>), <span class="ident">value</span>, <span class="ident">doc</span>));
             }
         }
 
-        <span class="kw">let</span> <span class="ident">rules</span> <span class="op">=</span> [<span class="self">self</span>.<span class="ident">annotations</span>.<span class="ident">parse_atom</span>::<span class="op">&lt;</span><span class="ident">RenameRule</span><span class="op">&gt;</span>(<span class="string">&quot;rename-all&quot;</span>),
-                     <span class="ident">config</span>.<span class="ident">enumeration</span>.<span class="ident">rename_variants</span>];
+        <span class="kw">let</span> <span class="ident">rules</span> <span class="op">=</span> [
+            <span class="self">self</span>.<span class="ident">annotations</span>.<span class="ident">parse_atom</span>::<span class="op">&lt;</span><span class="ident">RenameRule</span><span class="op">&gt;</span>(<span class="string">&quot;rename-all&quot;</span>),
+            <span class="ident">config</span>.<span class="ident">enumeration</span>.<span class="ident">rename_variants</span>,
+        ];
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="ident">find_first_some</span>(<span class="kw-2">&amp;</span><span class="ident">rules</span>) {
-            <span class="self">self</span>.<span class="ident">values</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">iter</span>()
-                                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="ident">r</span>.<span class="ident">apply_to_pascal_case</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="number">0</span>,
-                                                                      <span class="ident">IdentifierType</span>::<span class="ident">EnumVariant</span>(<span class="self">self</span>)),
-                                               <span class="ident">x</span>.<span class="number">1</span>.<span class="ident">clone</span>(),
-                                               <span class="ident">x</span>.<span class="number">2</span>.<span class="ident">clone</span>()))
-                                     .<span class="ident">collect</span>();
+            <span class="self">self</span>.<span class="ident">values</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">values</span>
+                .<span class="ident">iter</span>()
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> {
+                    (
+                        <span class="ident">r</span>.<span class="ident">apply_to_pascal_case</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="number">0</span>, <span class="ident">IdentifierType</span>::<span class="ident">EnumVariant</span>(<span class="self">self</span>)),
+                        <span class="ident">x</span>.<span class="number">1</span>.<span class="ident">clone</span>(),
+                        <span class="ident">x</span>.<span class="number">2</span>.<span class="ident">clone</span>(),
+                    )
+                })
+                .<span class="ident">collect</span>();
         }
     }
 }
@@ -426,13 +414,13 @@
             <span class="kw">if</span> <span class="ident">size</span>.<span class="ident">is_none</span>() {
                 <span class="ident">out</span>.<span class="ident">write</span>(<span class="string">&quot;typedef enum&quot;</span>);
             } <span class="kw">else</span> {
-                <span class="ident">out</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;enum {}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>));
+                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">out</span>, <span class="string">&quot;enum {}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>);
             }
         } <span class="kw">else</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">prim</span>) <span class="op">=</span> <span class="ident">size</span> {
-                <span class="ident">out</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;enum class {} : {}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>, <span class="ident">prim</span>));
+                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">out</span>, <span class="string">&quot;enum class {} : {}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>, <span class="ident">prim</span>);
             } <span class="kw">else</span> {
-                <span class="ident">out</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;enum class {}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>));
+                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">out</span>, <span class="string">&quot;enum class {}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>);
             }
         }
         <span class="ident">out</span>.<span class="ident">open_brace</span>();
@@ -441,7 +429,7 @@
                 <span class="ident">out</span>.<span class="ident">new_line</span>()
             }
             <span class="ident">value</span>.<span class="number">2</span>.<span class="ident">write</span>(<span class="ident">config</span>, <span class="ident">out</span>);
-            <span class="ident">out</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{} = {},&quot;</span>, <span class="ident">value</span>.<span class="number">0</span>, <span class="ident">value</span>.<span class="number">1</span>));
+            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">out</span>, <span class="string">&quot;{} = {},&quot;</span>, <span class="ident">value</span>.<span class="number">0</span>, <span class="ident">value</span>.<span class="number">1</span>);
         }
         <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">enumeration</span>.<span class="ident">add_sentinel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">annotations</span>) {
             <span class="ident">out</span>.<span class="ident">new_line</span>();
@@ -451,7 +439,7 @@
 
         <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">language</span> <span class="op">==</span> <span class="ident">Language</span>::<span class="ident">C</span> <span class="op">&amp;&amp;</span> <span class="ident">size</span>.<span class="ident">is_none</span>() {
             <span class="ident">out</span>.<span class="ident">close_brace</span>(<span class="bool-val">false</span>);
-            <span class="ident">out</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot; {};&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>));
+            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">out</span>, <span class="string">&quot; {};&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>);
         } <span class="kw">else</span> {
             <span class="ident">out</span>.<span class="ident">close_brace</span>(<span class="bool-val">true</span>);
         }
@@ -459,7 +447,7 @@
         <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">language</span> <span class="op">==</span> <span class="ident">Language</span>::<span class="ident">C</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">prim</span>) <span class="op">=</span> <span class="ident">size</span> {
                 <span class="ident">out</span>.<span class="ident">new_line</span>();
-                <span class="ident">out</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;typedef {} {};&quot;</span>, <span class="ident">prim</span>, <span class="self">self</span>.<span class="ident">name</span>));
+                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">out</span>, <span class="string">&quot;typedef {} {};&quot;</span>, <span class="ident">prim</span>, <span class="self">self</span>.<span class="ident">name</span>);
             }
         }
 
@@ -484,13 +472,15 @@
                     <dd>Show this help dialog</dd>
                     <dt>S</dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt>↑</dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt>↓</dt>
                     <dd>Move down in search results</dd>
+                    <dt>↹</dt>
+                    <dd>Switch tab</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
+                    <dt style="width:31px;">+ / -</dt>
                     <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>

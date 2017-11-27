@@ -824,6 +824,13 @@
 <span id="779">779</span>
 <span id="780">780</span>
 <span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
 </pre><pre class="rust ">
 <span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -837,16 +844,18 @@
 <span class="kw">use</span> <span class="ident">syn</span>;
 
 <span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">cargo</span>::{<span class="ident">Cargo</span>, <span class="ident">PackageRef</span>};
-<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">ir</span>::{<span class="ident">AnnotationSet</span>, <span class="ident">Cfg</span>, <span class="ident">Constant</span>, <span class="ident">Documentation</span>, <span class="ident">Enum</span>, <span class="ident">Function</span>};
-<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">ir</span>::{<span class="ident">ItemMap</span>, <span class="ident">OpaqueItem</span>, <span class="ident">Specialization</span>, <span class="ident">Static</span>, <span class="ident">Struct</span>, <span class="ident">Typedef</span>, <span class="ident">Union</span>};
+<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">ir</span>::{<span class="ident">AnnotationSet</span>, <span class="ident">Cfg</span>, <span class="ident">Constant</span>, <span class="ident">Documentation</span>, <span class="ident">Enum</span>, <span class="ident">Function</span>, <span class="ident">GenericParams</span>};
+<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">ir</span>::{<span class="ident">ItemMap</span>, <span class="ident">OpaqueItem</span>, <span class="ident">Static</span>, <span class="ident">Struct</span>, <span class="ident">Typedef</span>, <span class="ident">Union</span>};
 <span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">utilities</span>::{<span class="ident">SynAbiHelpers</span>, <span class="ident">SynItemHelpers</span>};
 
-<span class="kw">const</span> <span class="ident">STD_CRATES</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;std&quot;</span>,
-                                              <span class="string">&quot;std_unicode&quot;</span>,
-                                              <span class="string">&quot;alloc&quot;</span>,
-                                              <span class="string">&quot;collections&quot;</span>,
-                                              <span class="string">&quot;core&quot;</span>,
-                                              <span class="string">&quot;proc_macro&quot;</span>];
+<span class="kw">const</span> <span class="ident">STD_CRATES</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="string">&quot;std&quot;</span>,
+    <span class="string">&quot;std_unicode&quot;</span>,
+    <span class="string">&quot;alloc&quot;</span>,
+    <span class="string">&quot;collections&quot;</span>,
+    <span class="string">&quot;core&quot;</span>,
+    <span class="string">&quot;proc_macro&quot;</span>,
+];
 
 <span class="kw">type</span> <span class="ident">ParseResult</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Parse</span>, <span class="ident">String</span><span class="op">&gt;</span>;
 
@@ -882,11 +891,13 @@
 <span class="doccomment">/// Inside a crate, `mod` and `extern crate` declarations are followed</span>
 <span class="doccomment">/// and parsed. To find an external crate, the parser uses the `cargo metadata`</span>
 <span class="doccomment">/// command to find the location of dependencies.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_lib</span>(<span class="ident">lib</span>: <span class="ident">Cargo</span>,
-                        <span class="ident">parse_deps</span>: <span class="ident">bool</span>,
-                        <span class="ident">include</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span>,
-                        <span class="ident">exclude</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-                        <span class="ident">expand</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">ParseResult</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_lib</span>(
+    <span class="ident">lib</span>: <span class="ident">Cargo</span>,
+    <span class="ident">parse_deps</span>: <span class="ident">bool</span>,
+    <span class="ident">include</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">exclude</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">expand</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+) <span class="op">-&gt;</span> <span class="ident">ParseResult</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">Parser</span> {
         <span class="ident">binding_crate_name</span>: <span class="ident">lib</span>.<span class="ident">binding_crate_name</span>().<span class="ident">to_owned</span>(),
         <span class="ident">lib</span>: <span class="prelude-val">Some</span>(<span class="ident">lib</span>),
@@ -948,8 +959,7 @@
         }
 
         <span class="comment">// Check the blacklist</span>
-        <span class="kw">return</span> <span class="op">!</span><span class="ident">STD_CRATES</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">pkg_name</span>.<span class="ident">as_ref</span>()) <span class="op">&amp;&amp;</span>
-               <span class="op">!</span><span class="self">self</span>.<span class="ident">exclude</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">pkg_name</span>);
+        <span class="kw">return</span> <span class="op">!</span><span class="ident">STD_CRATES</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">pkg_name</span>.<span class="ident">as_ref</span>()) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">exclude</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">pkg_name</span>);
     }
 
     <span class="kw">fn</span> <span class="ident">parse_crate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pkg</span>: <span class="kw-2">&amp;</span><span class="ident">PackageRef</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
@@ -965,14 +975,15 @@
         <span class="kw">let</span> <span class="ident">crate_src</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lib</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">find_crate_src</span>(<span class="ident">pkg</span>);
 
         <span class="kw">match</span> <span class="ident">crate_src</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">crate_src</span>) <span class="op">=&gt;</span> {
-                <span class="self">self</span>.<span class="ident">parse_mod</span>(<span class="ident">pkg</span>, <span class="ident">crate_src</span>.<span class="ident">as_path</span>())
-            },
+            <span class="prelude-val">Some</span>(<span class="ident">crate_src</span>) <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">parse_mod</span>(<span class="ident">pkg</span>, <span class="ident">crate_src</span>.<span class="ident">as_path</span>()),
             <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
                 <span class="comment">// This should be an error, but is common enough to just elicit a warning</span>
-                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Parsing crate `{}`: can&#39;t find lib.rs with `cargo metadata`.&quot;</span>, <span class="ident">pkg</span>.<span class="ident">name</span>);
+                <span class="macro">warn</span><span class="macro">!</span>(
+                    <span class="string">&quot;Parsing crate `{}`: can&#39;t find lib.rs with `cargo metadata`.&quot;</span>,
+                    <span class="ident">pkg</span>.<span class="ident">name</span>
+                );
                 <span class="prelude-val">Ok</span>(())
-            },
+            }
         }
     }
 
@@ -982,7 +993,8 @@
         <span class="kw">let</span> <span class="ident">mod_parsed</span> <span class="op">=</span> {
             <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">cache_expanded_crate</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">pkg</span>.<span class="ident">name</span>) {
                 <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lib</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">expand_crate</span>(<span class="ident">pkg</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">syn</span>::<span class="ident">parse_crate</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">msg</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Parsing crate `{}`:\n{}.&quot;</span>, <span class="ident">pkg</span>.<span class="ident">name</span>, <span class="ident">msg</span>))<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">syn</span>::<span class="ident">parse_crate</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>)
+                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">msg</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Parsing crate `{}`:\n{}.&quot;</span>, <span class="ident">pkg</span>.<span class="ident">name</span>, <span class="ident">msg</span>))<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">cache_expanded_crate</span>.<span class="ident">insert</span>(<span class="ident">pkg</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">i</span>.<span class="ident">items</span>);
             }
 
@@ -992,13 +1004,17 @@
         <span class="self">self</span>.<span class="ident">process_expanded_mod</span>(<span class="ident">pkg</span>, <span class="kw-2">&amp;</span><span class="ident">mod_parsed</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">process_expanded_mod</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-                            <span class="ident">pkg</span>: <span class="kw-2">&amp;</span><span class="ident">PackageRef</span>,
-                            <span class="ident">items</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Item</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">out</span>.<span class="ident">load_syn_crate_mod</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binding_crate_name</span>,
-                                    <span class="kw-2">&amp;</span><span class="ident">pkg</span>.<span class="ident">name</span>,
-                                    <span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cfg_stack</span>),
-                                    <span class="ident">items</span>);
+    <span class="kw">fn</span> <span class="ident">process_expanded_mod</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">pkg</span>: <span class="kw-2">&amp;</span><span class="ident">PackageRef</span>,
+        <span class="ident">items</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Item</span><span class="op">&gt;</span>,
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">out</span>.<span class="ident">load_syn_crate_mod</span>(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binding_crate_name</span>,
+            <span class="kw-2">&amp;</span><span class="ident">pkg</span>.<span class="ident">name</span>,
+            <span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cfg_stack</span>),
+            <span class="ident">items</span>,
+        );
 
         <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">items</span> {
             <span class="kw">match</span> <span class="ident">item</span>.<span class="ident">node</span> {
@@ -1011,7 +1027,11 @@
                     <span class="kw">if</span> <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">inline_items</span>) <span class="op">=</span> <span class="ident">inline_items</span> {
                         <span class="self">self</span>.<span class="ident">process_expanded_mod</span>(<span class="ident">pkg</span>, <span class="ident">inline_items</span>)<span class="question-mark">?</span>;
                     } <span class="kw">else</span> {
-                        <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;Parsing crate `{}`: external mod found in expanded source, this shouldn&#39;t be possible.&quot;</span>, <span class="ident">pkg</span>.<span class="ident">name</span>);
+                        <span class="macro">error</span><span class="macro">!</span>(
+                            <span class="string">&quot;Parsing crate `{}`: external mod found in expanded source, \
+                             this shouldn&#39;t be possible.&quot;</span>,
+                            <span class="ident">pkg</span>.<span class="ident">name</span>
+                        );
                     }
 
                     <span class="kw">if</span> <span class="ident">cfg</span>.<span class="ident">is_some</span>() {
@@ -1028,15 +1048,26 @@
 
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_parse_dependency</span>(<span class="kw-2">&amp;</span><span class="ident">dep_pkg_name</span>) {
                         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">lib</span>.<span class="ident">is_some</span>() {
-                            <span class="kw">let</span> <span class="ident">dep_pkg_ref</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lib</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">find_dep_ref</span>(<span class="ident">pkg</span>, <span class="kw-2">&amp;</span><span class="ident">dep_pkg_name</span>);
+                            <span class="kw">let</span> <span class="ident">dep_pkg_ref</span> <span class="op">=</span>
+                                <span class="self">self</span>.<span class="ident">lib</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">find_dep_ref</span>(<span class="ident">pkg</span>, <span class="kw-2">&amp;</span><span class="ident">dep_pkg_name</span>);
 
                             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dep_pkg_ref</span>) <span class="op">=</span> <span class="ident">dep_pkg_ref</span> {
                                 <span class="self">self</span>.<span class="ident">parse_crate</span>(<span class="kw-2">&amp;</span><span class="ident">dep_pkg_ref</span>)<span class="question-mark">?</span>;
                             } <span class="kw">else</span> {
-                                <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;Parsing crate `{}`: can&#39;t find dependency version for `{}`.&quot;</span>, <span class="ident">pkg</span>.<span class="ident">name</span>, <span class="ident">dep_pkg_name</span>);
+                                <span class="macro">error</span><span class="macro">!</span>(
+                                    <span class="string">&quot;Parsing crate `{}`: can&#39;t find dependency version for `{}`.&quot;</span>,
+                                    <span class="ident">pkg</span>.<span class="ident">name</span>,
+                                    <span class="ident">dep_pkg_name</span>
+                                );
                             }
                         } <span class="kw">else</span> {
-                            <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;Parsing crate `{}`: cannot parse external crate `{}` because cbindgen is in single source mode. Consider specifying a crate directory instead of a source file.&quot;</span>, <span class="ident">pkg</span>.<span class="ident">name</span>, <span class="ident">dep_pkg_name</span>);
+                            <span class="macro">error</span><span class="macro">!</span>(
+                                <span class="string">&quot;Parsing crate `{}`: cannot parse external crate `{}` because \
+                                 cbindgen is in single source mode. Consider specifying a crate \
+                                 directory instead of a source file.&quot;</span>,
+                                <span class="ident">pkg</span>.<span class="ident">name</span>,
+                                <span class="ident">dep_pkg_name</span>
+                            );
                         }
                     }
 
@@ -1051,9 +1082,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_mod</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-                 <span class="ident">pkg</span>: <span class="kw-2">&amp;</span><span class="ident">PackageRef</span>,
-                 <span class="ident">mod_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_mod</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pkg</span>: <span class="kw-2">&amp;</span><span class="ident">PackageRef</span>, <span class="ident">mod_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">mod_parsed</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">owned_mod_path</span> <span class="op">=</span> <span class="ident">mod_path</span>.<span class="ident">to_path_buf</span>();
 
@@ -1067,10 +1096,24 @@
                 }
 
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">new</span>();
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">File</span>::<span class="ident">open</span>(<span class="ident">mod_path</span>).<span class="ident">map_err</span>(<span class="op">|</span>_<span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Parsing crate `{}`: cannot open file `{:?}`.&quot;</span>, <span class="ident">pkg</span>.<span class="ident">name</span>, <span class="ident">mod_path</span>))<span class="question-mark">?</span>;
-                <span class="ident">f</span>.<span class="ident">read_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">s</span>).<span class="ident">map_err</span>(<span class="op">|</span>_<span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Parsing crate `{}`: cannot open file `{:?}`.&quot;</span>, <span class="ident">pkg</span>.<span class="ident">name</span>, <span class="ident">mod_path</span>))<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">File</span>::<span class="ident">open</span>(<span class="ident">mod_path</span>).<span class="ident">map_err</span>(<span class="op">|</span>_<span class="op">|</span> {
+                    <span class="macro">format</span><span class="macro">!</span>(
+                        <span class="string">&quot;Parsing crate `{}`: cannot open file `{:?}`.&quot;</span>,
+                        <span class="ident">pkg</span>.<span class="ident">name</span>,
+                        <span class="ident">mod_path</span>
+                    )
+                })<span class="question-mark">?</span>;
+                <span class="ident">f</span>.<span class="ident">read_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">s</span>).<span class="ident">map_err</span>(<span class="op">|</span>_<span class="op">|</span> {
+                    <span class="macro">format</span><span class="macro">!</span>(
+                        <span class="string">&quot;Parsing crate `{}`: cannot open file `{:?}`.&quot;</span>,
+                        <span class="ident">pkg</span>.<span class="ident">name</span>,
+                        <span class="ident">mod_path</span>
+                    )
+                })<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">syn</span>::<span class="ident">parse_crate</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">msg</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Parsing crate `{}`:\n{}.&quot;</span>, <span class="ident">pkg</span>.<span class="ident">name</span>, <span class="ident">limit_string</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>)))<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">syn</span>::<span class="ident">parse_crate</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">msg</span><span class="op">|</span> {
+                    <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Parsing crate `{}`:\n{}.&quot;</span>, <span class="ident">pkg</span>.<span class="ident">name</span>, <span class="ident">limit_string</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>))
+                })<span class="question-mark">?</span>;
 
                 <span class="self">self</span>.<span class="ident">cache_src</span>.<span class="ident">insert</span>(<span class="ident">owned_mod_path</span>.<span class="ident">clone</span>(), <span class="ident">i</span>.<span class="ident">items</span>);
             }
@@ -1080,19 +1123,21 @@
 
         <span class="kw">let</span> <span class="ident">mod_dir</span> <span class="op">=</span> <span class="ident">mod_path</span>.<span class="ident">parent</span>().<span class="ident">unwrap</span>();
 
-        <span class="self">self</span>.<span class="ident">process_mod</span>(<span class="ident">pkg</span>,
-                         <span class="ident">mod_dir</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">mod_parsed</span>)
+        <span class="self">self</span>.<span class="ident">process_mod</span>(<span class="ident">pkg</span>, <span class="ident">mod_dir</span>, <span class="kw-2">&amp;</span><span class="ident">mod_parsed</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">process_mod</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-                   <span class="ident">pkg</span>: <span class="kw-2">&amp;</span><span class="ident">PackageRef</span>,
-                   <span class="ident">mod_dir</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
-                   <span class="ident">items</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Item</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">out</span>.<span class="ident">load_syn_crate_mod</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binding_crate_name</span>,
-                                    <span class="kw-2">&amp;</span><span class="ident">pkg</span>.<span class="ident">name</span>,
-                                    <span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cfg_stack</span>),
-                                    <span class="ident">items</span>);
+    <span class="kw">fn</span> <span class="ident">process_mod</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">pkg</span>: <span class="kw-2">&amp;</span><span class="ident">PackageRef</span>,
+        <span class="ident">mod_dir</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
+        <span class="ident">items</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Item</span><span class="op">&gt;</span>,
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">out</span>.<span class="ident">load_syn_crate_mod</span>(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binding_crate_name</span>,
+            <span class="kw-2">&amp;</span><span class="ident">pkg</span>.<span class="ident">name</span>,
+            <span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cfg_stack</span>),
+            <span class="ident">items</span>,
+        );
 
         <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">items</span> {
             <span class="kw">match</span> <span class="ident">item</span>.<span class="ident">node</span> {
@@ -1105,22 +1150,23 @@
                     }
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">inline_items</span>) <span class="op">=</span> <span class="ident">inline_items</span> {
-                        <span class="self">self</span>.<span class="ident">process_mod</span>(<span class="ident">pkg</span>,
-                                         <span class="kw-2">&amp;</span><span class="ident">mod_dir</span>.<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="ident">next_mod_name</span>),
-                                         <span class="ident">inline_items</span>)<span class="question-mark">?</span>;
+                        <span class="self">self</span>.<span class="ident">process_mod</span>(<span class="ident">pkg</span>, <span class="kw-2">&amp;</span><span class="ident">mod_dir</span>.<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="ident">next_mod_name</span>), <span class="ident">inline_items</span>)<span class="question-mark">?</span>;
                     } <span class="kw">else</span> {
                         <span class="kw">let</span> <span class="ident">next_mod_path1</span> <span class="op">=</span> <span class="ident">mod_dir</span>.<span class="ident">join</span>(<span class="ident">next_mod_name</span>.<span class="ident">clone</span>() <span class="op">+</span> <span class="string">&quot;.rs&quot;</span>);
                         <span class="kw">let</span> <span class="ident">next_mod_path2</span> <span class="op">=</span> <span class="ident">mod_dir</span>.<span class="ident">join</span>(<span class="ident">next_mod_name</span>.<span class="ident">clone</span>()).<span class="ident">join</span>(<span class="string">&quot;mod.rs&quot;</span>);
 
                         <span class="kw">if</span> <span class="ident">next_mod_path1</span>.<span class="ident">exists</span>() {
-                            <span class="self">self</span>.<span class="ident">parse_mod</span>(<span class="ident">pkg</span>,
-                                           <span class="ident">next_mod_path1</span>.<span class="ident">as_path</span>())<span class="question-mark">?</span>;
+                            <span class="self">self</span>.<span class="ident">parse_mod</span>(<span class="ident">pkg</span>, <span class="ident">next_mod_path1</span>.<span class="ident">as_path</span>())<span class="question-mark">?</span>;
                         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">next_mod_path2</span>.<span class="ident">exists</span>() {
-                            <span class="self">self</span>.<span class="ident">parse_mod</span>(<span class="ident">pkg</span>,
-                                           <span class="ident">next_mod_path2</span>.<span class="ident">as_path</span>())<span class="question-mark">?</span>;
+                            <span class="self">self</span>.<span class="ident">parse_mod</span>(<span class="ident">pkg</span>, <span class="ident">next_mod_path2</span>.<span class="ident">as_path</span>())<span class="question-mark">?</span>;
                         } <span class="kw">else</span> {
-                            <span class="comment">// This should be an error, but is common enough to just elicit a warning</span>
-                            <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Parsing crate `{}`: can&#39;t find mod {}`.&quot;</span>, <span class="ident">pkg</span>.<span class="ident">name</span>, <span class="ident">next_mod_name</span>);
+                            <span class="comment">// This should be an error, but it&#39;s common enough to</span>
+                            <span class="comment">// just elicit a warning</span>
+                            <span class="macro">warn</span><span class="macro">!</span>(
+                                <span class="string">&quot;Parsing crate `{}`: can&#39;t find mod {}`.&quot;</span>,
+                                <span class="ident">pkg</span>.<span class="ident">name</span>,
+                                <span class="ident">next_mod_name</span>
+                            );
                         }
                     }
 
@@ -1142,15 +1188,26 @@
 
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_parse_dependency</span>(<span class="kw-2">&amp;</span><span class="ident">dep_pkg_name</span>) {
                         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">lib</span>.<span class="ident">is_some</span>() {
-                            <span class="kw">let</span> <span class="ident">dep_pkg_ref</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lib</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">find_dep_ref</span>(<span class="ident">pkg</span>, <span class="kw-2">&amp;</span><span class="ident">dep_pkg_name</span>);
+                            <span class="kw">let</span> <span class="ident">dep_pkg_ref</span> <span class="op">=</span>
+                                <span class="self">self</span>.<span class="ident">lib</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">find_dep_ref</span>(<span class="ident">pkg</span>, <span class="kw-2">&amp;</span><span class="ident">dep_pkg_name</span>);
 
                             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dep_pkg_ref</span>) <span class="op">=</span> <span class="ident">dep_pkg_ref</span> {
                                 <span class="self">self</span>.<span class="ident">parse_crate</span>(<span class="kw-2">&amp;</span><span class="ident">dep_pkg_ref</span>)<span class="question-mark">?</span>;
                             } <span class="kw">else</span> {
-                                <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;Parsing crate `{}`: can&#39;t find dependency version for `{}`.&quot;</span>, <span class="ident">pkg</span>.<span class="ident">name</span>, <span class="ident">dep_pkg_name</span>);
+                                <span class="macro">error</span><span class="macro">!</span>(
+                                    <span class="string">&quot;Parsing crate `{}`: can&#39;t find dependency version for `{}`.&quot;</span>,
+                                    <span class="ident">pkg</span>.<span class="ident">name</span>,
+                                    <span class="ident">dep_pkg_name</span>
+                                );
                             }
                         } <span class="kw">else</span> {
-                            <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;Parsing crate `{}`: cannot parse external crate `{}` because cbindgen is in single source mode. Consider specifying a crate directory instead of a source file.&quot;</span>, <span class="ident">pkg</span>.<span class="ident">name</span>, <span class="ident">dep_pkg_name</span>);
+                            <span class="macro">error</span><span class="macro">!</span>(
+                                <span class="string">&quot;Parsing crate `{}`: cannot parse external crate `{}` because \
+                                 cbindgen is in single source mode. Consider specifying a crate \
+                                 directory instead of a source file.&quot;</span>,
+                                <span class="ident">pkg</span>.<span class="ident">name</span>,
+                                <span class="ident">dep_pkg_name</span>
+                            );
                         }
                     }
 
@@ -1175,7 +1232,6 @@
     <span class="kw">pub</span> <span class="ident">unions</span>: <span class="ident">ItemMap</span><span class="op">&lt;</span><span class="ident">Union</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">opaque_items</span>: <span class="ident">ItemMap</span><span class="op">&lt;</span><span class="ident">OpaqueItem</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">typedefs</span>: <span class="ident">ItemMap</span><span class="op">&lt;</span><span class="ident">Typedef</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">specializations</span>: <span class="ident">ItemMap</span><span class="op">&lt;</span><span class="ident">Specialization</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">functions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Function</span><span class="op">&gt;</span>,
 }
 
@@ -1189,7 +1245,6 @@
             <span class="ident">unions</span>: <span class="ident">ItemMap</span>::<span class="ident">new</span>(),
             <span class="ident">opaque_items</span>: <span class="ident">ItemMap</span>::<span class="ident">new</span>(),
             <span class="ident">typedefs</span>: <span class="ident">ItemMap</span>::<span class="ident">new</span>(),
-            <span class="ident">specializations</span>: <span class="ident">ItemMap</span>::<span class="ident">new</span>(),
             <span class="ident">functions</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
         }
     }
@@ -1198,9 +1253,9 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">add_opaque</span> <span class="op">=</span> <span class="op">|</span><span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">generic_params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">|</span> {
             <span class="self">self</span>.<span class="ident">opaque_items</span>.<span class="ident">try_insert</span>(<span class="ident">OpaqueItem</span> {
                 <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_owned</span>(),
-                <span class="ident">generic_params</span>: <span class="ident">generic_params</span>.<span class="ident">iter</span>()
-                                              .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">x</span>).<span class="ident">to_owned</span>())
-                                              .<span class="ident">collect</span>(),
+                <span class="ident">generic_params</span>: <span class="ident">GenericParams</span>(
+                    <span class="ident">generic_params</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">x</span>).<span class="ident">to_owned</span>()).<span class="ident">collect</span>(),
+                ),
                 <span class="ident">cfg</span>: <span class="prelude-val">None</span>,
                 <span class="ident">annotations</span>: <span class="ident">AnnotationSet</span>::<span class="ident">new</span>(),
                 <span class="ident">documentation</span>: <span class="ident">Documentation</span>::<span class="ident">none</span>(),
@@ -1230,52 +1285,43 @@
         <span class="self">self</span>.<span class="ident">unions</span>.<span class="ident">extend_with</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">unions</span>);
         <span class="self">self</span>.<span class="ident">opaque_items</span>.<span class="ident">extend_with</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">opaque_items</span>);
         <span class="self">self</span>.<span class="ident">typedefs</span>.<span class="ident">extend_with</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">typedefs</span>);
-        <span class="self">self</span>.<span class="ident">specializations</span>.<span class="ident">extend_with</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">specializations</span>);
         <span class="self">self</span>.<span class="ident">functions</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">functions</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_syn_crate_mod</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-                              <span class="ident">binding_crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                              <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                              <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
-                              <span class="ident">items</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Item</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_syn_crate_mod</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">binding_crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
+        <span class="ident">items</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Item</span><span class="op">&gt;</span>,
+    ) {
         <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">items</span> {
             <span class="kw">match</span> <span class="ident">item</span>.<span class="ident">node</span> {
                 <span class="ident">syn</span>::<span class="ident">ItemKind</span>::<span class="ident">ForeignMod</span>(<span class="kw-2">ref</span> <span class="ident">block</span>) <span class="op">=&gt;</span> {
-                    <span class="self">self</span>.<span class="ident">load_syn_foreign_mod</span>(<span class="ident">binding_crate_name</span>,
-                                              <span class="ident">crate_name</span>,
-                                              <span class="ident">mod_cfg</span>,
-                                              <span class="ident">item</span>,
-                                              <span class="ident">block</span>);
+                    <span class="self">self</span>.<span class="ident">load_syn_foreign_mod</span>(<span class="ident">binding_crate_name</span>, <span class="ident">crate_name</span>, <span class="ident">mod_cfg</span>, <span class="ident">item</span>, <span class="ident">block</span>);
                 }
-                <span class="ident">syn</span>::<span class="ident">ItemKind</span>::<span class="ident">Fn</span>(<span class="kw-2">ref</span> <span class="ident">decl</span>,
-                                  <span class="kw-2">ref</span> <span class="ident">_unsafe</span>,
-                                  <span class="kw-2">ref</span> <span class="ident">_const</span>,
-                                  <span class="kw-2">ref</span> <span class="ident">abi</span>,
-                                  <span class="kw-2">ref</span> <span class="ident">_generic</span>,
-                                  <span class="kw-2">ref</span> <span class="ident">_block</span>) <span class="op">=&gt;</span> {
-                    <span class="self">self</span>.<span class="ident">load_syn_fn</span>(<span class="ident">binding_crate_name</span>,
-                                     <span class="ident">crate_name</span>,
-                                     <span class="ident">mod_cfg</span>,
-                                     <span class="ident">item</span>,
-                                     <span class="ident">decl</span>,
-                                     <span class="ident">abi</span>);
+                <span class="ident">syn</span>::<span class="ident">ItemKind</span>::<span class="ident">Fn</span>(
+                    <span class="kw-2">ref</span> <span class="ident">decl</span>,
+                    <span class="kw-2">ref</span> <span class="ident">_unsafe</span>,
+                    <span class="kw-2">ref</span> <span class="ident">_const</span>,
+                    <span class="kw-2">ref</span> <span class="ident">abi</span>,
+                    <span class="kw-2">ref</span> <span class="ident">_generic</span>,
+                    <span class="kw-2">ref</span> <span class="ident">_block</span>,
+                ) <span class="op">=&gt;</span> {
+                    <span class="self">self</span>.<span class="ident">load_syn_fn</span>(<span class="ident">binding_crate_name</span>, <span class="ident">crate_name</span>, <span class="ident">mod_cfg</span>, <span class="ident">item</span>, <span class="ident">decl</span>, <span class="ident">abi</span>);
                 }
                 <span class="ident">syn</span>::<span class="ident">ItemKind</span>::<span class="ident">Const</span>(<span class="kw-2">ref</span> <span class="ident">ty</span>, <span class="kw-2">ref</span> <span class="ident">expr</span>) <span class="op">=&gt;</span> {
-                    <span class="self">self</span>.<span class="ident">load_syn_const</span>(<span class="ident">binding_crate_name</span>,
-                                        <span class="ident">crate_name</span>,
-                                        <span class="ident">mod_cfg</span>,
-                                        <span class="ident">item</span>,
-                                        <span class="ident">ty</span>,
-                                        <span class="ident">expr</span>);
+                    <span class="self">self</span>.<span class="ident">load_syn_const</span>(<span class="ident">binding_crate_name</span>, <span class="ident">crate_name</span>, <span class="ident">mod_cfg</span>, <span class="ident">item</span>, <span class="ident">ty</span>, <span class="ident">expr</span>);
                 }
                 <span class="ident">syn</span>::<span class="ident">ItemKind</span>::<span class="ident">Static</span>(<span class="kw-2">ref</span> <span class="ident">ty</span>, <span class="kw-2">ref</span> <span class="ident">mutability</span>, <span class="kw-2">ref</span> <span class="ident">_expr</span>) <span class="op">=&gt;</span> {
-                    <span class="self">self</span>.<span class="ident">load_syn_static</span>(<span class="ident">binding_crate_name</span>,
-                                         <span class="ident">crate_name</span>,
-                                         <span class="ident">mod_cfg</span>,
-                                         <span class="ident">item</span>,
-                                         <span class="ident">ty</span>,
-                                         <span class="ident">mutability</span>);
+                    <span class="self">self</span>.<span class="ident">load_syn_static</span>(
+                        <span class="ident">binding_crate_name</span>,
+                        <span class="ident">crate_name</span>,
+                        <span class="ident">mod_cfg</span>,
+                        <span class="ident">item</span>,
+                        <span class="ident">ty</span>,
+                        <span class="ident">mutability</span>,
+                    );
                 }
                 <span class="ident">syn</span>::<span class="ident">ItemKind</span>::<span class="ident">Struct</span>(<span class="kw-2">ref</span> <span class="ident">variant</span>, <span class="kw-2">ref</span> <span class="ident">generics</span>) <span class="op">=&gt;</span> {
                     <span class="self">self</span>.<span class="ident">load_syn_struct</span>(<span class="ident">crate_name</span>, <span class="ident">mod_cfg</span>, <span class="ident">item</span>, <span class="ident">variant</span>, <span class="ident">generics</span>);
@@ -1289,50 +1335,61 @@
                 <span class="ident">syn</span>::<span class="ident">ItemKind</span>::<span class="ident">Ty</span>(<span class="kw-2">ref</span> <span class="ident">ty</span>, <span class="kw-2">ref</span> <span class="ident">generics</span>) <span class="op">=&gt;</span> {
                     <span class="self">self</span>.<span class="ident">load_syn_ty</span>(<span class="ident">crate_name</span>, <span class="ident">mod_cfg</span>, <span class="ident">item</span>, <span class="ident">ty</span>, <span class="ident">generics</span>);
                 }
-                _ <span class="op">=&gt;</span> { }
+                _ <span class="op">=&gt;</span> {}
             }
         }
     }
 
     <span class="doccomment">/// Enters a `extern &quot;C&quot; { }` declaration and loads function declarations.</span>
-    <span class="kw">fn</span> <span class="ident">load_syn_foreign_mod</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-                            <span class="ident">binding_crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                            <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                            <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
-                            <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
-                            <span class="ident">block</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">ForeignMod</span>) {
+    <span class="kw">fn</span> <span class="ident">load_syn_foreign_mod</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">binding_crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
+        <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
+        <span class="ident">block</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">ForeignMod</span>,
+    ) {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">block</span>.<span class="ident">abi</span>.<span class="ident">is_c</span>() {
-            <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Skip {}::{} - (extern block must be extern C).&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>);
+            <span class="macro">info</span><span class="macro">!</span>(
+                <span class="string">&quot;Skip {}::{} - (extern block must be extern C).&quot;</span>,
+                <span class="ident">crate_name</span>,
+                <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>
+            );
             <span class="kw">return</span>;
         }
 
         <span class="kw">for</span> <span class="ident">foreign_item</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">block</span>.<span class="ident">items</span> {
             <span class="kw">match</span> <span class="ident">foreign_item</span>.<span class="ident">node</span> {
-                <span class="ident">syn</span>::<span class="ident">ForeignItemKind</span>::<span class="ident">Fn</span>(<span class="kw-2">ref</span> <span class="ident">decl</span>,
-                                         <span class="kw-2">ref</span> <span class="ident">_generic</span>) <span class="op">=&gt;</span> {
+                <span class="ident">syn</span>::<span class="ident">ForeignItemKind</span>::<span class="ident">Fn</span>(<span class="kw-2">ref</span> <span class="ident">decl</span>, <span class="kw-2">ref</span> <span class="ident">_generic</span>) <span class="op">=&gt;</span> {
                     <span class="kw">if</span> <span class="ident">crate_name</span> <span class="op">!=</span> <span class="ident">binding_crate_name</span> {
-                        <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Skip {}::{} - (fn&#39;s outside of the binding crate are not used).&quot;</span>,
-                              <span class="ident">crate_name</span>,
-                              <span class="kw-2">&amp;</span><span class="ident">foreign_item</span>.<span class="ident">ident</span>);
+                        <span class="macro">info</span><span class="macro">!</span>(
+                            <span class="string">&quot;Skip {}::{} - (fn&#39;s outside of the binding crate are not used).&quot;</span>,
+                            <span class="ident">crate_name</span>,
+                            <span class="kw-2">&amp;</span><span class="ident">foreign_item</span>.<span class="ident">ident</span>
+                        );
                         <span class="kw">return</span>;
                     }
 
-                    <span class="kw">match</span> <span class="ident">Function</span>::<span class="ident">load</span>(<span class="ident">foreign_item</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>(),
-                                         <span class="ident">decl</span>,
-                                         <span class="bool-val">true</span>,
-                                         <span class="kw-2">&amp;</span><span class="ident">foreign_item</span>.<span class="ident">attrs</span>,
-                                         <span class="ident">mod_cfg</span>) {
+                    <span class="kw">match</span> <span class="ident">Function</span>::<span class="ident">load</span>(
+                        <span class="ident">foreign_item</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>(),
+                        <span class="ident">decl</span>,
+                        <span class="bool-val">true</span>,
+                        <span class="kw-2">&amp;</span><span class="ident">foreign_item</span>.<span class="ident">attrs</span>,
+                        <span class="ident">mod_cfg</span>,
+                    ) {
                         <span class="prelude-val">Ok</span>(<span class="ident">func</span>) <span class="op">=&gt;</span> {
                             <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Take {}::{}.&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">foreign_item</span>.<span class="ident">ident</span>);
 
                             <span class="self">self</span>.<span class="ident">functions</span>.<span class="ident">push</span>(<span class="ident">func</span>);
                         }
                         <span class="prelude-val">Err</span>(<span class="ident">msg</span>) <span class="op">=&gt;</span> {
-                            <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;Cannot use fn {}::{} ({}).&quot;</span>,
-                                   <span class="ident">crate_name</span>,
-                                   <span class="kw-2">&amp;</span><span class="ident">foreign_item</span>.<span class="ident">ident</span>,
-                                   <span class="ident">msg</span>);
-                        },
+                            <span class="macro">error</span><span class="macro">!</span>(
+                                <span class="string">&quot;Cannot use fn {}::{} ({}).&quot;</span>,
+                                <span class="ident">crate_name</span>,
+                                <span class="kw-2">&amp;</span><span class="ident">foreign_item</span>.<span class="ident">ident</span>,
+                                <span class="ident">msg</span>
+                            );
+                        }
                     }
                 }
                 _ <span class="op">=&gt;</span> {}
@@ -1341,269 +1398,226 @@
     }
 
     <span class="doccomment">/// Loads a `fn` declaration</span>
-    <span class="kw">fn</span> <span class="ident">load_syn_fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-                   <span class="ident">binding_crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                   <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                   <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
-                   <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
-                   <span class="ident">decl</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">FnDecl</span>,
-                   <span class="ident">abi</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Abi</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">load_syn_fn</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">binding_crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
+        <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
+        <span class="ident">decl</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">FnDecl</span>,
+        <span class="ident">abi</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Abi</span><span class="op">&gt;</span>,
+    ) {
         <span class="kw">if</span> <span class="ident">crate_name</span> <span class="op">!=</span> <span class="ident">binding_crate_name</span> {
-            <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Skip {}::{} - (fn&#39;s outside of the binding crate are not used).&quot;</span>,
-                  <span class="ident">crate_name</span>,
-                  <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>);
+            <span class="macro">info</span><span class="macro">!</span>(
+                <span class="string">&quot;Skip {}::{} - (fn&#39;s outside of the binding crate are not used).&quot;</span>,
+                <span class="ident">crate_name</span>,
+                <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>
+            );
             <span class="kw">return</span>;
         }
 
         <span class="kw">if</span> <span class="ident">item</span>.<span class="ident">is_no_mangle</span>() <span class="op">&amp;&amp;</span> (<span class="ident">abi</span>.<span class="ident">is_omitted</span>() <span class="op">||</span> <span class="ident">abi</span>.<span class="ident">is_c</span>()) {
-            <span class="kw">match</span> <span class="ident">Function</span>::<span class="ident">load</span>(<span class="ident">item</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>(),
-                                 <span class="ident">decl</span>,
-                                 <span class="bool-val">false</span>,
-                                 <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>,
-                                 <span class="ident">mod_cfg</span>) {
+            <span class="kw">match</span> <span class="ident">Function</span>::<span class="ident">load</span>(<span class="ident">item</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>(), <span class="ident">decl</span>, <span class="bool-val">false</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>, <span class="ident">mod_cfg</span>) {
                 <span class="prelude-val">Ok</span>(<span class="ident">func</span>) <span class="op">=&gt;</span> {
                     <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Take {}::{}.&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>);
 
                     <span class="self">self</span>.<span class="ident">functions</span>.<span class="ident">push</span>(<span class="ident">func</span>);
                 }
                 <span class="prelude-val">Err</span>(<span class="ident">msg</span>) <span class="op">=&gt;</span> {
-                    <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;Cannot use fn {}::{} ({}).&quot;</span>,
-                           <span class="ident">crate_name</span>,
-                           <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>,
-                           <span class="ident">msg</span>);
-                },
+                    <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;Cannot use fn {}::{} ({}).&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>, <span class="ident">msg</span>);
+                }
             }
         } <span class="kw">else</span> {
             <span class="kw">if</span> (<span class="ident">abi</span>.<span class="ident">is_omitted</span>() <span class="op">||</span> <span class="ident">abi</span>.<span class="ident">is_c</span>()) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">item</span>.<span class="ident">is_no_mangle</span>() {
-                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Skip {}::{} - (`extern` but not `no_mangle`).&quot;</span>,
-                      <span class="ident">crate_name</span>,
-                      <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>);
+                <span class="macro">warn</span><span class="macro">!</span>(
+                    <span class="string">&quot;Skip {}::{} - (`extern` but not `no_mangle`).&quot;</span>,
+                    <span class="ident">crate_name</span>,
+                    <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>
+                );
             }
             <span class="kw">if</span> <span class="ident">abi</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span>(<span class="ident">abi</span>.<span class="ident">is_omitted</span>() <span class="op">||</span> <span class="ident">abi</span>.<span class="ident">is_c</span>()) {
-                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Skip {}::{} - (non `extern \&quot;C\&quot;`).&quot;</span>,
-                      <span class="ident">crate_name</span>,
-                      <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>);
+                <span class="macro">warn</span><span class="macro">!</span>(
+                    <span class="string">&quot;Skip {}::{} - (non `extern \&quot;C\&quot;`).&quot;</span>,
+                    <span class="ident">crate_name</span>,
+                    <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>
+                );
             }
         }
     }
 
     <span class="doccomment">/// Loads a `const` declaration</span>
-    <span class="kw">fn</span> <span class="ident">load_syn_const</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-                      <span class="ident">binding_crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                      <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                      <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
-                      <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
-                      <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Ty</span>,
-                      <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Expr</span>) {
+    <span class="kw">fn</span> <span class="ident">load_syn_const</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">binding_crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
+        <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
+        <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Ty</span>,
+        <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Expr</span>,
+    ) {
         <span class="kw">if</span> <span class="ident">crate_name</span> <span class="op">!=</span> <span class="ident">binding_crate_name</span> {
-            <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Skip {}::{} - (const&#39;s outside of the binding crate are not used).&quot;</span>,
-                  <span class="ident">crate_name</span>,
-                  <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>);
+            <span class="macro">info</span><span class="macro">!</span>(
+                <span class="string">&quot;Skip {}::{} - (const&#39;s outside of the binding crate are not used).&quot;</span>,
+                <span class="ident">crate_name</span>,
+                <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>
+            );
             <span class="kw">return</span>;
         }
 
         <span class="kw">let</span> <span class="ident">const_name</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>();
 
-        <span class="kw">match</span> <span class="ident">Constant</span>::<span class="ident">load</span>(<span class="ident">const_name</span>.<span class="ident">clone</span>(),
-                             <span class="ident">ty</span>,
-                             <span class="ident">expr</span>,
-                             <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>,
-                             <span class="ident">mod_cfg</span>) {
+        <span class="kw">match</span> <span class="ident">Constant</span>::<span class="ident">load</span>(<span class="ident">const_name</span>.<span class="ident">clone</span>(), <span class="ident">ty</span>, <span class="ident">expr</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>, <span class="ident">mod_cfg</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">constant</span>) <span class="op">=&gt;</span> {
                 <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Take {}::{}.&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>);
 
                 <span class="self">self</span>.<span class="ident">constants</span>.<span class="ident">try_insert</span>(<span class="ident">constant</span>);
             }
             <span class="prelude-val">Err</span>(<span class="ident">msg</span>) <span class="op">=&gt;</span> {
-                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Skip {}::{} - ({})&quot;</span>,
-                      <span class="ident">crate_name</span>,
-                      <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>,
-                      <span class="ident">msg</span>);
+                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Skip {}::{} - ({})&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>, <span class="ident">msg</span>);
             }
         }
     }
 
     <span class="doccomment">/// Loads a `static` declaration</span>
-    <span class="kw">fn</span> <span class="ident">load_syn_static</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-                       <span class="ident">binding_crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                       <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                       <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
-                       <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
-                       <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Ty</span>,
-                       <span class="ident">mutability</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Mutability</span>) {
+    <span class="kw">fn</span> <span class="ident">load_syn_static</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">binding_crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
+        <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
+        <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Ty</span>,
+        <span class="ident">mutability</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Mutability</span>,
+    ) {
         <span class="kw">if</span> <span class="ident">crate_name</span> <span class="op">!=</span> <span class="ident">binding_crate_name</span> {
-            <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Skip {}::{} - (static&#39;s outside of the binding crate are not used).&quot;</span>,
-                  <span class="ident">crate_name</span>,
-                  <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>);
+            <span class="macro">info</span><span class="macro">!</span>(
+                <span class="string">&quot;Skip {}::{} - (static&#39;s outside of the binding crate are not used).&quot;</span>,
+                <span class="ident">crate_name</span>,
+                <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>
+            );
             <span class="kw">return</span>;
         }
 
         <span class="kw">let</span> <span class="ident">static_name</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>();
 
-        <span class="kw">match</span> <span class="ident">Static</span>::<span class="ident">load</span>(<span class="ident">static_name</span>.<span class="ident">clone</span>(),
-                           <span class="ident">ty</span>,
-                           <span class="ident">mutability</span>,
-                           <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>,
-                            <span class="ident">mod_cfg</span>) {
+        <span class="kw">match</span> <span class="ident">Static</span>::<span class="ident">load</span>(<span class="ident">static_name</span>.<span class="ident">clone</span>(), <span class="ident">ty</span>, <span class="ident">mutability</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>, <span class="ident">mod_cfg</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">constant</span>) <span class="op">=&gt;</span> {
                 <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Take {}::{}.&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>);
 
                 <span class="self">self</span>.<span class="ident">globals</span>.<span class="ident">try_insert</span>(<span class="ident">constant</span>);
             }
             <span class="prelude-val">Err</span>(<span class="ident">msg</span>) <span class="op">=&gt;</span> {
-                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Skip {}::{} - ({})&quot;</span>,
-                      <span class="ident">crate_name</span>,
-                      <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>,
-                      <span class="ident">msg</span>);
+                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Skip {}::{} - ({})&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>, <span class="ident">msg</span>);
             }
         }
     }
 
     <span class="doccomment">/// Loads a `struct` declaration</span>
-    <span class="kw">fn</span> <span class="ident">load_syn_struct</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-                       <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                       <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
-                       <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
-                       <span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">VariantData</span>,
-                       <span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Generics</span>) {
+    <span class="kw">fn</span> <span class="ident">load_syn_struct</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
+        <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
+        <span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">VariantData</span>,
+        <span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Generics</span>,
+    ) {
         <span class="kw">let</span> <span class="ident">struct_name</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>();
 
-        <span class="kw">match</span> <span class="ident">Struct</span>::<span class="ident">load</span>(<span class="ident">struct_name</span>.<span class="ident">clone</span>(),
-                           <span class="ident">variant</span>,
-                           <span class="ident">generics</span>,
-                           <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>,
-                           <span class="ident">mod_cfg</span>) {
+        <span class="kw">match</span> <span class="ident">Struct</span>::<span class="ident">load</span>(<span class="ident">struct_name</span>.<span class="ident">clone</span>(), <span class="ident">variant</span>, <span class="ident">generics</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>, <span class="ident">mod_cfg</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">st</span>) <span class="op">=&gt;</span> {
                 <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Take {}::{}.&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>);
 
                 <span class="self">self</span>.<span class="ident">structs</span>.<span class="ident">try_insert</span>(<span class="ident">st</span>);
             }
             <span class="prelude-val">Err</span>(<span class="ident">msg</span>) <span class="op">=&gt;</span> {
-                <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Take {}::{} - opaque ({}).&quot;</span>,
-                      <span class="ident">crate_name</span>,
-                      <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>,
-                      <span class="ident">msg</span>);
-                <span class="self">self</span>.<span class="ident">opaque_items</span>.<span class="ident">try_insert</span>(<span class="ident">OpaqueItem</span>::<span class="ident">new</span>(<span class="ident">struct_name</span>,
-                                                             <span class="ident">generics</span>,
-                                                             <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>,
-                                                             <span class="ident">mod_cfg</span>));
+                <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Take {}::{} - opaque ({}).&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>, <span class="ident">msg</span>);
+                <span class="self">self</span>.<span class="ident">opaque_items</span>
+                    .<span class="ident">try_insert</span>(<span class="ident">OpaqueItem</span>::<span class="ident">new</span>(<span class="ident">struct_name</span>, <span class="ident">generics</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>, <span class="ident">mod_cfg</span>));
             }
         }
     }
 
     <span class="doccomment">/// Loads a `union` declaration</span>
-    <span class="kw">fn</span> <span class="ident">load_syn_union</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-                      <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                      <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
-                      <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
-                      <span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">VariantData</span>,
-                      <span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Generics</span>) {
+    <span class="kw">fn</span> <span class="ident">load_syn_union</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
+        <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
+        <span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">VariantData</span>,
+        <span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Generics</span>,
+    ) {
         <span class="kw">let</span> <span class="ident">union_name</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>();
 
-        <span class="kw">match</span> <span class="ident">Union</span>::<span class="ident">load</span>(<span class="ident">union_name</span>.<span class="ident">clone</span>(),
-                          <span class="ident">variant</span>,
-                          <span class="ident">generics</span>,
-                          <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>,
-                          <span class="ident">mod_cfg</span>) {
+        <span class="kw">match</span> <span class="ident">Union</span>::<span class="ident">load</span>(<span class="ident">union_name</span>.<span class="ident">clone</span>(), <span class="ident">variant</span>, <span class="ident">generics</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>, <span class="ident">mod_cfg</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">st</span>) <span class="op">=&gt;</span> {
                 <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Take {}::{}.&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>);
 
                 <span class="self">self</span>.<span class="ident">unions</span>.<span class="ident">try_insert</span>(<span class="ident">st</span>);
             }
             <span class="prelude-val">Err</span>(<span class="ident">msg</span>) <span class="op">=&gt;</span> {
-                <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Take {}::{} - opaque ({}).&quot;</span>,
-                      <span class="ident">crate_name</span>,
-                      <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>,
-                      <span class="ident">msg</span>);
-                <span class="self">self</span>.<span class="ident">opaque_items</span>.<span class="ident">try_insert</span>(<span class="ident">OpaqueItem</span>::<span class="ident">new</span>(<span class="ident">union_name</span>,
-                                                             <span class="ident">generics</span>,
-                                                             <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>,
-                                                             <span class="ident">mod_cfg</span>));
+                <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Take {}::{} - opaque ({}).&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>, <span class="ident">msg</span>);
+                <span class="self">self</span>.<span class="ident">opaque_items</span>
+                    .<span class="ident">try_insert</span>(<span class="ident">OpaqueItem</span>::<span class="ident">new</span>(<span class="ident">union_name</span>, <span class="ident">generics</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>, <span class="ident">mod_cfg</span>));
             }
         }
     }
 
     <span class="doccomment">/// Loads a `enum` declaration</span>
-    <span class="kw">fn</span> <span class="ident">load_syn_enum</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-                     <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                     <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
-                     <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
-                     <span class="ident">variants</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Variant</span><span class="op">&gt;</span>,
-                     <span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Generics</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">generics</span>.<span class="ident">lifetimes</span>.<span class="ident">is_empty</span>() <span class="op">||</span>
-           <span class="op">!</span><span class="ident">generics</span>.<span class="ident">ty_params</span>.<span class="ident">is_empty</span>() <span class="op">||</span>
-           <span class="op">!</span><span class="ident">generics</span>.<span class="ident">where_clause</span>.<span class="ident">predicates</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Skip {}::{} - (has generics or lifetimes or where bounds).&quot;</span>,
-                  <span class="ident">crate_name</span>,
-                  <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>);
+    <span class="kw">fn</span> <span class="ident">load_syn_enum</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
+        <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
+        <span class="ident">variants</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Variant</span><span class="op">&gt;</span>,
+        <span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Generics</span>,
+    ) {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">generics</span>.<span class="ident">lifetimes</span>.<span class="ident">is_empty</span>() <span class="op">||</span> <span class="op">!</span><span class="ident">generics</span>.<span class="ident">ty_params</span>.<span class="ident">is_empty</span>()
+            <span class="op">||</span> <span class="op">!</span><span class="ident">generics</span>.<span class="ident">where_clause</span>.<span class="ident">predicates</span>.<span class="ident">is_empty</span>()
+        {
+            <span class="macro">info</span><span class="macro">!</span>(
+                <span class="string">&quot;Skip {}::{} - (has generics or lifetimes or where bounds).&quot;</span>,
+                <span class="ident">crate_name</span>,
+                <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>
+            );
             <span class="kw">return</span>;
         }
         <span class="kw">let</span> <span class="ident">enum_name</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>();
 
-        <span class="kw">match</span> <span class="ident">Enum</span>::<span class="ident">load</span>(<span class="ident">enum_name</span>.<span class="ident">clone</span>(),
-                         <span class="ident">variants</span>,
-                         <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>,
-                         <span class="ident">mod_cfg</span>) {
+        <span class="kw">match</span> <span class="ident">Enum</span>::<span class="ident">load</span>(<span class="ident">enum_name</span>.<span class="ident">clone</span>(), <span class="ident">variants</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>, <span class="ident">mod_cfg</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">en</span>) <span class="op">=&gt;</span> {
                 <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Take {}::{}.&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>);
                 <span class="self">self</span>.<span class="ident">enums</span>.<span class="ident">try_insert</span>(<span class="ident">en</span>);
             }
             <span class="prelude-val">Err</span>(<span class="ident">msg</span>) <span class="op">=&gt;</span> {
                 <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Take {}::{} - opaque ({}).&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>, <span class="ident">msg</span>);
-                <span class="self">self</span>.<span class="ident">opaque_items</span>.<span class="ident">try_insert</span>(<span class="ident">OpaqueItem</span>::<span class="ident">new</span>(<span class="ident">enum_name</span>,
-                                                             <span class="ident">generics</span>,
-                                                             <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>,
-                                                             <span class="ident">mod_cfg</span>));
+                <span class="self">self</span>.<span class="ident">opaque_items</span>
+                    .<span class="ident">try_insert</span>(<span class="ident">OpaqueItem</span>::<span class="ident">new</span>(<span class="ident">enum_name</span>, <span class="ident">generics</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>, <span class="ident">mod_cfg</span>));
             }
         }
     }
 
     <span class="doccomment">/// Loads a `type` declaration</span>
-    <span class="kw">fn</span> <span class="ident">load_syn_ty</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-                   <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                   <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
-                   <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
-                   <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Ty</span>,
-                   <span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Generics</span>) {
+    <span class="kw">fn</span> <span class="ident">load_syn_ty</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">crate_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">mod_cfg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cfg</span><span class="op">&gt;</span>,
+        <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Item</span>,
+        <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Ty</span>,
+        <span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Generics</span>,
+    ) {
         <span class="kw">let</span> <span class="ident">alias_name</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>();
 
-        <span class="kw">let</span> <span class="ident">fail1</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">generics</span>.<span class="ident">lifetimes</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span>
-                       <span class="ident">generics</span>.<span class="ident">ty_params</span>.<span class="ident">is_empty</span>()
-        {
-            <span class="kw">match</span> <span class="ident">Typedef</span>::<span class="ident">load</span>(<span class="ident">alias_name</span>.<span class="ident">clone</span>(),
-                                <span class="ident">ty</span>,
-                                <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>,
-                                <span class="ident">mod_cfg</span>)
-            {
-                <span class="prelude-val">Ok</span>(<span class="ident">typedef</span>) <span class="op">=&gt;</span> {
-                    <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Take {}::{}.&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>);
-                    <span class="self">self</span>.<span class="ident">typedefs</span>.<span class="ident">try_insert</span>(<span class="ident">typedef</span>);
-                    <span class="kw">return</span>;
-                }
-                <span class="prelude-val">Err</span>(<span class="ident">msg</span>) <span class="op">=&gt;</span> <span class="ident">msg</span>,
-            }
-        } <span class="kw">else</span> {
-            <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Cannot have generics in typedef.&quot;</span>)
-        };
-
-        <span class="kw">let</span> <span class="ident">fail2</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Specialization</span>::<span class="ident">load</span>(<span class="ident">alias_name</span>.<span class="ident">clone</span>(),
-                                               <span class="ident">generics</span>,
-                                               <span class="ident">ty</span>,
-                                               <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>,
-                                               <span class="ident">mod_cfg</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">spec</span>) <span class="op">=&gt;</span> {
+        <span class="kw">match</span> <span class="ident">Typedef</span>::<span class="ident">load</span>(<span class="ident">alias_name</span>.<span class="ident">clone</span>(), <span class="ident">ty</span>, <span class="ident">generics</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>, <span class="ident">mod_cfg</span>) {
+            <span class="prelude-val">Ok</span>(<span class="ident">st</span>) <span class="op">=&gt;</span> {
                 <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Take {}::{}.&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>);
-                <span class="self">self</span>.<span class="ident">specializations</span>.<span class="ident">try_insert</span>(<span class="ident">spec</span>);
-                <span class="kw">return</span>;
-            }
-            <span class="prelude-val">Err</span>(<span class="ident">msg</span>) <span class="op">=&gt;</span> <span class="ident">msg</span>,
-        };
 
-        <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Skip {}::{} - ({} and {}).&quot;</span>,
-              <span class="ident">crate_name</span>,
-              <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>,
-              <span class="ident">fail1</span>,
-              <span class="ident">fail2</span>);
+                <span class="self">self</span>.<span class="ident">typedefs</span>.<span class="ident">try_insert</span>(<span class="ident">st</span>);
+            }
+            <span class="prelude-val">Err</span>(<span class="ident">msg</span>) <span class="op">=&gt;</span> {
+                <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Take {}::{} - opaque ({}).&quot;</span>, <span class="ident">crate_name</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">ident</span>, <span class="ident">msg</span>);
+                <span class="self">self</span>.<span class="ident">opaque_items</span>
+                    .<span class="ident">try_insert</span>(<span class="ident">OpaqueItem</span>::<span class="ident">new</span>(<span class="ident">alias_name</span>, <span class="ident">generics</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>, <span class="ident">mod_cfg</span>));
+            }
+        }
     }
 }
 </pre>
@@ -1624,13 +1638,15 @@
                     <dd>Show this help dialog</dd>
                     <dt>S</dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt>↑</dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt>↓</dt>
                     <dd>Move down in search results</dd>
+                    <dt>↹</dt>
+                    <dd>Switch tab</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
+                    <dt style="width:31px;">+ / -</dt>
                     <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>

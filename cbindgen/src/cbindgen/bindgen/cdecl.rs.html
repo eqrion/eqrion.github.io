@@ -270,6 +270,7 @@
 <span id="225">225</span>
 <span id="226">226</span>
 <span id="227">227</span>
+<span id="228">228</span>
 </pre><pre class="rust ">
 <span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -278,7 +279,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Write</span>;
 
 <span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">ir</span>::{<span class="ident">Function</span>, <span class="ident">Type</span>};
-<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">writer</span>::<span class="ident">SourceWriter</span>;
+<span class="kw">use</span> <span class="ident">bindgen</span>::<span class="ident">writer</span>::{<span class="ident">ListType</span>, <span class="ident">SourceWriter</span>};
 
 <span class="comment">// This code is for translating Rust types into C declarations.</span>
 <span class="comment">// See Section 6.7, Declarations, in the C standard for background.</span>
@@ -303,7 +304,8 @@
 <span class="kw">struct</span> <span class="ident">CDecl</span> {
     <span class="ident">type_qualifers</span>: <span class="ident">String</span>,
     <span class="ident">type_name</span>: <span class="ident">String</span>,
-    <span class="ident">declarators</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CDeclarator</span><span class="op">&gt;</span>
+    <span class="ident">type_generic_args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span>,
+    <span class="ident">declarators</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CDeclarator</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">CDecl</span> {
@@ -311,6 +313,7 @@
         <span class="ident">CDecl</span> {
             <span class="ident">type_qualifers</span>: <span class="ident">String</span>::<span class="ident">new</span>(),
             <span class="ident">type_name</span>: <span class="ident">String</span>::<span class="ident">new</span>(),
+            <span class="ident">type_generic_args</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
             <span class="ident">declarators</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
         }
     }
@@ -327,18 +330,20 @@
     }
 
     <span class="kw">fn</span> <span class="ident">build_func</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">Function</span>, <span class="ident">layout_vertical</span>: <span class="ident">bool</span>) {
-        <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">args</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">arg_name</span>, <span class="kw-2">ref</span> <span class="ident">arg_ty</span>)<span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">arg_name</span>.<span class="ident">clone</span>()), <span class="ident">CDecl</span>::<span class="ident">from_type</span>(<span class="ident">arg_ty</span>))).<span class="ident">collect</span>();
-        <span class="self">self</span>.<span class="ident">declarators</span>.<span class="ident">push</span>(<span class="ident">CDeclarator</span>::<span class="ident">Func</span>(<span class="ident">args</span>, <span class="ident">layout_vertical</span>));
+        <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">args</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">arg_name</span>, <span class="kw-2">ref</span> <span class="ident">arg_ty</span>)<span class="op">|</span> {
+                (<span class="prelude-val">Some</span>(<span class="ident">arg_name</span>.<span class="ident">clone</span>()), <span class="ident">CDecl</span>::<span class="ident">from_type</span>(<span class="ident">arg_ty</span>))
+            })
+            .<span class="ident">collect</span>();
+        <span class="self">self</span>.<span class="ident">declarators</span>
+            .<span class="ident">push</span>(<span class="ident">CDeclarator</span>::<span class="ident">Func</span>(<span class="ident">args</span>, <span class="ident">layout_vertical</span>));
         <span class="self">self</span>.<span class="ident">build_type</span>(<span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">ret</span>, <span class="bool-val">false</span>);
     }
 
     <span class="kw">fn</span> <span class="ident">build_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">is_const</span>: <span class="ident">bool</span>) {
         <span class="kw">match</span> <span class="ident">t</span> {
             <span class="kw-2">&amp;</span><span class="ident">Type</span>::<span class="ident">Path</span>(<span class="kw-2">ref</span> <span class="ident">path</span>) <span class="op">=&gt;</span> {
-                <span class="comment">// We should be assured that there are no generics by instantiating</span>
-                <span class="comment">// monomorphs and mangling paths.</span>
-                <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">path</span>.<span class="ident">generics</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>);
-
                 <span class="kw">if</span> <span class="ident">is_const</span> {
                     <span class="macro">assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">type_qualifers</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>);
                     <span class="self">self</span>.<span class="ident">type_qualifers</span> <span class="op">=</span> <span class="string">&quot;const&quot;</span>.<span class="ident">to_owned</span>();
@@ -346,6 +351,8 @@
 
                 <span class="macro">assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">type_name</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>);
                 <span class="self">self</span>.<span class="ident">type_name</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
+                <span class="macro">assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">type_generic_args</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>);
+                <span class="self">self</span>.<span class="ident">type_generic_args</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">generics</span>.<span class="ident">clone</span>();
             }
             <span class="kw-2">&amp;</span><span class="ident">Type</span>::<span class="ident">Primitive</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) <span class="op">=&gt;</span> {
                 <span class="kw">if</span> <span class="ident">is_const</span> {
@@ -357,7 +364,7 @@
                 <span class="self">self</span>.<span class="ident">type_name</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">to_string</span>();
             }
 
-            <span class="kw-2">&amp;</span><span class="ident">Type</span>::<span class="ident">ConstPtr</span>(<span class="kw-2">ref</span> <span class="ident">t</span>)  <span class="op">=&gt;</span> {
+            <span class="kw-2">&amp;</span><span class="ident">Type</span>::<span class="ident">ConstPtr</span>(<span class="kw-2">ref</span> <span class="ident">t</span>) <span class="op">=&gt;</span> {
                 <span class="self">self</span>.<span class="ident">declarators</span>.<span class="ident">push</span>(<span class="ident">CDeclarator</span>::<span class="ident">Ptr</span>(<span class="ident">is_const</span>));
                 <span class="self">self</span>.<span class="ident">build_type</span>(<span class="ident">t</span>, <span class="bool-val">true</span>);
             }
@@ -379,15 +386,18 @@
     }
 
     <span class="kw">fn</span> <span class="ident">write</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SourceWriter</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">ident</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) {
-
         <span class="comment">// Write the type-specifier and type-qualifier first</span>
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">type_qualifers</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="number">0</span> {
-            <span class="ident">out</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">type_qualifers</span>);
-            <span class="ident">out</span>.<span class="ident">write</span>(<span class="string">&quot; &quot;</span>);
-            <span class="ident">out</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">type_name</span>);
+            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">out</span>, <span class="string">&quot;{} {}&quot;</span>, <span class="self">self</span>.<span class="ident">type_qualifers</span>, <span class="self">self</span>.<span class="ident">type_name</span>);
         } <span class="kw">else</span> {
-            <span class="ident">out</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">type_name</span>);
+            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">out</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">type_name</span>);
         };
+
+        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">type_generic_args</span>.<span class="ident">is_empty</span>() {
+            <span class="ident">out</span>.<span class="ident">write</span>(<span class="string">&quot;&lt;&quot;</span>);
+            <span class="ident">out</span>.<span class="ident">write_horizontal_source_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">type_generic_args</span>, <span class="ident">ListType</span>::<span class="ident">Join</span>(<span class="string">&quot;, &quot;</span>));
+            <span class="ident">out</span>.<span class="ident">write</span>(<span class="string">&quot;&gt;&quot;</span>);
+        }
 
         <span class="comment">// When we have an identifier, put a space between the type and the declarators</span>
         <span class="kw">if</span> <span class="ident">ident</span>.<span class="ident">is_some</span>() {
@@ -395,37 +405,29 @@
         }
 
         <span class="comment">// Write the left part of declarators before the identifier</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter_rev</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">declarators</span>.<span class="ident">iter</span>()
-                                       .<span class="ident">rev</span>()
-                                       .<span class="ident">peekable</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter_rev</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">declarators</span>.<span class="ident">iter</span>().<span class="ident">rev</span>().<span class="ident">peekable</span>();
 
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">declarator</span>) <span class="op">=</span> <span class="ident">iter_rev</span>.<span class="ident">next</span>() {
             <span class="kw">let</span> <span class="ident">next_is_pointer</span> <span class="op">=</span> <span class="ident">iter_rev</span>.<span class="ident">peek</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">is_ptr</span>());
 
             <span class="kw">match</span> <span class="ident">declarator</span> {
-                <span class="kw-2">&amp;</span><span class="ident">CDeclarator</span>::<span class="ident">Ptr</span>(<span class="kw-2">ref</span> <span class="ident">is_const</span>) <span class="op">=&gt;</span> {
-                    <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">is_const</span> {
-                        <span class="ident">out</span>.<span class="ident">write</span>(<span class="string">&quot;*const &quot;</span>);
-                    } <span class="kw">else</span> {
-                        <span class="ident">out</span>.<span class="ident">write</span>(<span class="string">&quot;*&quot;</span>);
-                    }
+                <span class="kw-2">&amp;</span><span class="ident">CDeclarator</span>::<span class="ident">Ptr</span>(<span class="kw-2">ref</span> <span class="ident">is_const</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">is_const</span> {
+                    <span class="ident">out</span>.<span class="ident">write</span>(<span class="string">&quot;*const &quot;</span>);
+                } <span class="kw">else</span> {
+                    <span class="ident">out</span>.<span class="ident">write</span>(<span class="string">&quot;*&quot;</span>);
                 },
-                <span class="kw-2">&amp;</span><span class="ident">CDeclarator</span>::<span class="ident">Array</span>(..) <span class="op">=&gt;</span> {
-                    <span class="kw">if</span> <span class="ident">next_is_pointer</span> {
-                        <span class="ident">out</span>.<span class="ident">write</span>(<span class="string">&quot;(&quot;</span>);
-                    }
+                <span class="kw-2">&amp;</span><span class="ident">CDeclarator</span>::<span class="ident">Array</span>(..) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">next_is_pointer</span> {
+                    <span class="ident">out</span>.<span class="ident">write</span>(<span class="string">&quot;(&quot;</span>);
                 },
-                <span class="kw-2">&amp;</span><span class="ident">CDeclarator</span>::<span class="ident">Func</span>(..) <span class="op">=&gt;</span> {
-                    <span class="kw">if</span> <span class="ident">next_is_pointer</span> {
-                        <span class="ident">out</span>.<span class="ident">write</span>(<span class="string">&quot;(&quot;</span>);
-                    }
+                <span class="kw-2">&amp;</span><span class="ident">CDeclarator</span>::<span class="ident">Func</span>(..) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">next_is_pointer</span> {
+                    <span class="ident">out</span>.<span class="ident">write</span>(<span class="string">&quot;(&quot;</span>);
                 },
             }
         }
 
         <span class="comment">// Write the identifier</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="op">=</span> <span class="ident">ident</span> {
-            <span class="ident">out</span>.<span class="ident">write</span>(<span class="ident">ident</span>);
+            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">out</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">ident</span>);
         }
 
         <span class="comment">// Write the right part of declarators after the identifier</span>
@@ -436,15 +438,15 @@
             <span class="kw">match</span> <span class="ident">declarator</span> {
                 <span class="kw-2">&amp;</span><span class="ident">CDeclarator</span>::<span class="ident">Ptr</span>(..) <span class="op">=&gt;</span> {
                     <span class="ident">last_was_pointer</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                },
+                }
                 <span class="kw-2">&amp;</span><span class="ident">CDeclarator</span>::<span class="ident">Array</span>(<span class="kw-2">ref</span> <span class="ident">constant</span>) <span class="op">=&gt;</span> {
                     <span class="kw">if</span> <span class="ident">last_was_pointer</span> {
                         <span class="ident">out</span>.<span class="ident">write</span>(<span class="string">&quot;)&quot;</span>);
                     }
-                    <span class="ident">out</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;[{}]&quot;</span>, <span class="ident">constant</span>));
+                    <span class="macro">write</span><span class="macro">!</span>(<span class="ident">out</span>, <span class="string">&quot;[{}]&quot;</span>, <span class="ident">constant</span>);
 
                     <span class="ident">last_was_pointer</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                },
+                }
                 <span class="kw-2">&amp;</span><span class="ident">CDeclarator</span>::<span class="ident">Func</span>(<span class="kw-2">ref</span> <span class="ident">args</span>, <span class="ident">layout_vertical</span>) <span class="op">=&gt;</span> {
                     <span class="kw">if</span> <span class="ident">last_was_pointer</span> {
                         <span class="ident">out</span>.<span class="ident">write</span>(<span class="string">&quot;)&quot;</span>);
@@ -481,7 +483,7 @@
                     <span class="ident">out</span>.<span class="ident">write</span>(<span class="string">&quot;)&quot;</span>);
 
                     <span class="ident">last_was_pointer</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                },
+                }
             }
         }
     }
@@ -516,13 +518,15 @@
                     <dd>Show this help dialog</dd>
                     <dt>S</dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt>↑</dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt>↓</dt>
                     <dd>Move down in search results</dd>
+                    <dt>↹</dt>
+                    <dd>Switch tab</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
+                    <dt style="width:31px;">+ / -</dt>
                     <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
