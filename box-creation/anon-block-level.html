@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+	p {
+		border: thin red dashed;
+	}
+</style>
+</head>
+<body>
+
+	<!-- It's important to not use <p> for the root tag as that seems to emit a <p> around the first anonymous block level box -->
+	<div>
+		first anonymous block level box
+		<p>inner explicit block level box</p>
+		second anonymous block level box
+	</div>
+
+</body>
+</html>
