@@ -1,0 +1,14 @@
+<!DOCTYPE>
+<html>
+<body>
+    <div id="centered" style="position: absolute; width: 100px; height: 100px; background-color: red;">
+    </div>
+</body>
+<script type="text/javascript">
+    let centered = document.getElementById('centered');
+    window.addEventListener('resize', function() {
+        centered.style.left = (window.innerWidth / 2.0) + 'px';
+        centered.style.top = (window.innerHeight / 2.0) + 'px';
+    }, false);
+</script>
+</html>
