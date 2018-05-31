@@ -61,7 +61,7 @@
             lastGroup = group;
 
             let scrollHeight = group.clientHeight;
-            container.scrollTop += scrollHeight;
+            container.scrollBy(0, scrollHeight);
         }
 
         function asyncInsert() {
@@ -71,8 +71,8 @@
             }
         }
 
+        setInterval(busyWait, 1000);
         intervalID = setInterval(asyncInsert, 1000);
-        setInterval(busyWait, 700);
     </script>
 </body>
 </html>
