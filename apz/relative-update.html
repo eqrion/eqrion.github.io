@@ -32,11 +32,6 @@
         let lastRow = null;
         let intervalID = null;
 
-        function busyWait() {
-            let until = performance.now() + 1000;
-            while (performance.now() < until) { }
-        }
-
         function insertGroup() {
             let group = document.createElement('div');
             lastRow = null;
@@ -65,13 +60,16 @@
         }
 
         function asyncInsert() {
+            let until = performance.now() + 500;
+            while (performance.now() < until) { }
+
             insertGroup();
+
             if (rowIndex > 1000) {
                 clearInterval(intervalID);
             }
         }
 
-        setInterval(busyWait, 1000);
         intervalID = setInterval(asyncInsert, 1000);
     </script>
 </body>
