@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<style type="text/css">
+    #last-wheel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 200px;
+      height: 200px;
+      border: thin solid black;
+    }
+    #last-scroll {
+      position: fixed;
+      top: 240px;
+      right: 20px;
+      width: 200px;
+      height: 200px;
+      border: thin solid black;
+    }
+</style>
+<script type="text/javascript">
+  addEventListener('load', load);
+  addEventListener('wheel', wheel);
+  addEventListener('scroll', scroll);
+
+  let lastScrollY = 0;
+  const deltaMode = [
+    'DOM_DELTA_PIXEL',
+    'DOM_DELTA_LINE',
+    'DOM_DELTA_PAGE',
+  ];
+
+  function wheel(event) {
+    let description =
+      `wheel event\n` +
+      `  deltaX = ${event.deltaX}\n` +
+      `  deltaY = ${event.deltaY}\n` +
+      `  deltaZ = ${event.deltaZ}\n` +
+      `  deltaMode = ${deltaMode[event.deltaMode]}\n`;
+    document.getElementById('last-wheel').innerText = description;
+  }
+  function scroll(event) {
+    let description =
+      `scroll event\n` +
+      `  scrollY = ${window.scrollY}\n` +
+      `  deltaY = ${window.scrollY - lastScrollY}\n`;
+    document.getElementById('last-scroll').innerText = description;
+    lastScrollY = window.scrollY;
+  }
+
+    function fill(element) {
+        var text = '';
+        for (var i = 1; i < 10000; ++i) {
+            text = text + i + '\n';
+        }
+        element.innerText = text;
+    }
+
+  function load() {
+      fill(document.getElementById('text'));
+  }
+</script>
+<body>
+
+<div id="text">
+</div>
+<div id="last-wheel">
+</div>
+<div id="last-scroll">
+</div>
+
+</body>
+</html>
