@@ -1,7 +1,26 @@
-<!DOCTYPE>
+<!DOCTYPE html>
 <meta charset="utf-8">
 <html>
+<head>
+    <title>Scroll anchor test 1</title>
+    <style type="text/css">
+        p {
+            margin: 1em;
+        }
+    </style>
+    <script type="text/javascript">
+        function addElement() {
+            let container = document.querySelector('#container');
+            let div = document.createElement('div');
+            div.style = 'background-color: red; padding: 1em; width: 200px; height: 200px;';
+            container.appendChild(div);
+        }
+    </script>
+</head>
 <body>
+    <div id="container">
+    </div>
+
     <p>
     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lectus nulla at volutpat diam ut venenatis. Nunc congue nisi vitae suscipit tellus mauris a. In est ante in nibh mauris cursus. Dui sapien eget mi proin sed libero. Nulla at volutpat diam ut venenatis tellus in metus. Nec ullamcorper sit amet risus. Tincidunt tortor aliquam nulla facilisi. Leo urna molestie at elementum eu facilisis sed odio morbi. In massa tempor nec feugiat nisl pretium fusce id velit. Urna duis convallis convallis tellus id. Ut sem nulla pharetra diam sit amet nisl suscipit adipiscing. Sem nulla pharetra diam sit amet nisl suscipit. Nulla facilisi morbi tempus iaculis.
     </p>
@@ -29,6 +48,8 @@
     <p>
     Commodo sed egestas egestas fringilla phasellus faucibus scelerisque. Convallis tellus id interdum velit laoreet id. Ultrices mi tempus imperdiet nulla malesuada. Enim eu turpis egestas pretium aenean pharetra magna. Urna et pharetra pharetra massa massa ultricies mi quis. Ultricies mi eget mauris pharetra. Imperdiet nulla malesuada pellentesque elit eget. Dignissim suspendisse in est ante in nibh mauris cursus. Consequat ac felis donec et odio pellentesque. Sollicitudin aliquam ultrices sagittis orci a scelerisque purus. Aliquet eget sit amet tellus cras. Et netus et malesuada fames ac turpis egestas integer eget. Velit dignissim sodales ut eu. Vel quam elementum pulvinar etiam non quam lacus suspendisse. Pharetra magna ac placerat vestibulum. Pharetra et ultrices neque ornare aenean euismod elementum. Sagittis vitae et leo duis ut diam. Enim sit amet venenatis urna cursus eget. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus.
     </p>
+
+    <button onclick="addElement()">Add element to top</button>
 
     <p>
     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lectus nulla at volutpat diam ut venenatis. Nunc congue nisi vitae suscipit tellus mauris a. In est ante in nibh mauris cursus. Dui sapien eget mi proin sed libero. Nulla at volutpat diam ut venenatis tellus in metus. Nec ullamcorper sit amet risus. Tincidunt tortor aliquam nulla facilisi. Leo urna molestie at elementum eu facilisis sed odio morbi. In massa tempor nec feugiat nisl pretium fusce id velit. Urna duis convallis convallis tellus id. Ut sem nulla pharetra diam sit amet nisl suscipit adipiscing. Sem nulla pharetra diam sit amet nisl suscipit. Nulla facilisi morbi tempus iaculis.

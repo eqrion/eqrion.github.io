@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+        body {
+            font-family: sans-serif;
+        }
+        #box {
+            border: 5px solid black;
+        }
+    </style>
+    <script type="text/javascript">
+        let box;
+        let status;
+        let divWidth;
+        let divHeight;
+        let gradient;
+        let gradientWidth;
+        let gradientHeight;
+        let gradientRepeat;
+
+        function refresh() {
+            let dpi = window.devicePixelRatio;
+            let style =
+`
+width: ${divWidth.value / dpi}px;
+height: ${divHeight.value / dpi}px;
+background-image: ${gradient.value};
+background-size: ${gradientWidth.value / dpi}px ${gradientHeight.value / dpi}px;
+background-repeat: ${gradientRepeat.value};
+`;
+            status.innerText =
+`devicePixelRatio = ${dpi}
+ style {
+    ${style}
+ }
+`;
+            box.style = style;
+        }
+
+        addEventListener('input', refresh);
+        addEventListener('load', function() {
+            box = document.querySelector('#box');
+            status = document.querySelector('#status');
+            divWidth = document.querySelector('#input-div-width');
+            divHeight = document.querySelector('#input-div-height');
+            gradient = document.querySelector('#input-gradient');
+            gradientWidth = document.querySelector('#input-gradient-width');
+            gradientHeight = document.querySelector('#input-gradient-height');
+            gradientRepeat = document.querySelector('#input-gradient-repeat');
+            refresh();
+        });
+    </script>
+</head>
+<body>
+    <div id="box"></div>
+    <p id="status"></p>
+
+    <div>
+        <label for="input-div-width">div-width: </label>
+        <input type="text" id="input-div-width" value="100">
+    </div>
+
+    <div>
+        <label for="input-div-height">div-height: </label>
+        <input type="text" id="input-div-height" value="100">
+    </div>
+
+    <div>
+        <label for="input-gradient">gradient: </label>
+        <input type="text" id="input-gradient" value="linear-gradient(45deg, white, black)">
+    </div>
+
+    <div>
+        <label for="input-gradient-width">gradient-width: </label>
+        <input type="text" id="input-gradient-width" value="20">
+    </div>
+
+    <div>
+        <label for="input-gradient-height">gradient-height: </label>
+        <input type="text" id="input-gradient-height" value="20">
+    </div>
+
+    <div>
+        <label for="input-gradient-repeat">gradient-repeat: </label>
+        <select id="input-gradient-repeat">
+            <option>repeat</option>
+            <option>no-repeat</option>
+            <option>space</option>
+            <option>round</option>
+        </select>
+    </div>
+
+</body>
+</html>
