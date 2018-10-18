@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+        canvas {
+            border: 1px solid black;
+            margin: 1em;
+        }
+    </style>
+    <script>
+        addEventListener('load', async () => {
+            let video = document.querySelector('video');
+
+            let constraints = {
+                audio: false,
+                video: {
+                    width: 500,
+                    height: 500,
+                    mediaSource: 'screen',
+                },
+            };
+            let media = await navigator.mediaDevices.getUserMedia(constraints);
+            video.srcObject = media;
+            video.onloadedmetadata = (e) => {
+                video.play();
+            };
+        });
+
+        function snapshot() {
+            let video = document.querySelector('video');
+            let canvas = document.querySelector('canvas');
+            let ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+        }
+    </script>
+</head>
+<body>
+    <video></video>
+    <canvas width="500" height="500" onclick="snapshot()"></canvas>
+</body>
+</html>
