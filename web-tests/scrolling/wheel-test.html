@@ -7,7 +7,7 @@
       right: 20px;
       width: 200px;
       height: 200px;
-      border: thin solid black;
+      border: 2px dashed black;
     }
     #last-scroll {
       position: fixed;
@@ -15,13 +15,22 @@
       right: 20px;
       width: 200px;
       height: 200px;
-      border: thin solid black;
+      border: 2px dashed black;
+    }
+    #timeline {
+      position: fixed;
+      top: 460px;
+      right: 20px;
+      width: 200px;
+      height: 200px;
+      border: 2px dashed black;
     }
 </style>
 <script type="text/javascript">
   addEventListener('load', load);
   addEventListener('wheel', wheel);
   addEventListener('scroll', scroll);
+  addEventListener('keypress', key);
 
   let lastScrollY = 0;
   const deltaMode = [
@@ -29,6 +38,16 @@
     'DOM_DELTA_LINE',
     'DOM_DELTA_PAGE',
   ];
+  let timelineCanvas;
+  let timelineEvents;
+  let timelineStart;
+  let timelinePrevX;
+  let timelinePrevY;
+
+  const TIMELINE_WINDOW_MAX_Y = 500;
+  const TIMELINE_LEN_MILLIS = 5000;
+  const CANVAS_WIDTH = 200;
+  const CANVAS_HEIGHT = 200;
 
   function wheel(event) {
     let description =
@@ -48,16 +67,68 @@
     lastScrollY = window.scrollY;
   }
 
-    function fill(element) {
-        var text = '';
-        for (var i = 1; i < 10000; ++i) {
-            text = text + i + '\n';
-        }
-        element.innerText = text;
+  function fill(element) {
+    var text = '';
+    for (var i = 1; i < 10000; ++i) {
+        text = text + i + '\n';
     }
+    element.innerText = text;
+  }
 
   function load() {
-      fill(document.getElementById('text'));
+    fill(document.getElementById('text'));
+    timelineCanvas = document.getElementById('timeline-canvas');
+  }
+
+  function key(e) {
+    console.log(`pressing ${e.key}`);
+    if (e.key === 'r') {
+      let ctx = timelineCanvas.getContext('2d');
+      ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      timelineEvents = [];
+      timelineStart = performance.now();
+      timelinePrevX = 0;
+      timelinePrevY = 0;
+      requestAnimationFrame(timeline);
+    } else if (e.key === 's') {
+      viewObject(timelineEvents);
+    }
+  }
+
+  function viewObject(obj) {
+    let json = JSON.stringify(obj);
+    let uri = 'data:application/json,' + encodeURIComponent(json);
+    window.open(uri);
+  }
+
+  function timeline() {
+    let now = performance.now();
+    let t = (now - timelineStart) / TIMELINE_LEN_MILLIS;
+    let scrollY = window.scrollY;
+
+    if (t > 1.0) {
+      return;
+    }
+
+    let absoluteTime = (now - timelineStart);
+    timelineEvents.push([absoluteTime, scrollY]);
+
+    let x = t * CANVAS_WIDTH;
+    let y = (scrollY / TIMELINE_WINDOW_MAX_Y) * CANVAS_HEIGHT;
+
+    let ctx = timelineCanvas.getContext('2d');
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(timelinePrevX, timelinePrevY);
+    ctx.lineTo(x, y);
+    ctx.closePath();
+    ctx.stroke();
+
+    timelinePrevX = x;
+    timelinePrevY = y;
+
+    requestAnimationFrame(timeline);
   }
 </script>
 <body>
@@ -67,6 +138,9 @@
 <div id="last-wheel">
 </div>
 <div id="last-scroll">
+</div>
+<div id="timeline">
+  <canvas id="timeline-canvas" width="200" height="200"></canvas>
 </div>
 
 </body>
