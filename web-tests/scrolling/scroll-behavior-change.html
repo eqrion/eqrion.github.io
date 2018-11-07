@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+        .smooth {
+            scroll-behavior: smooth;
+        }
+        .instant {
+            scroll-behavior: auto;
+        }
+        #a {
+            height: 400px;
+            background-color: red;
+        }
+        #b {
+            height: 3000px;
+            background-color: green;
+        }
+    </style>
+</head>
+<body class="smooth">
+    <div/>
+        <div id="a">
+        </div>
+        <div id="b">
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        setTimeout(() => {
+            let root = document.documentElement;
+            root.className = 'smooth';
+            root.scrollBy(0, 200);
+            setTimeout(() => {
+                root.className = 'instant';
+                root.scrollBy(0, 200);
+            }, 32);
+        }, 3000);
+    </script>
+</body>
+</html>
