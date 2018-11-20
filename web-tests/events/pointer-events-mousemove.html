@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+        :root {
+            pointer-events: none;
+        }
+    </style>
+    <script type="text/javascript">
+        document.querySelector(':root').addEventListener('mousemove', () => {
+            console.log(':root.mousemove');
+        });
+        addEventListener('mousemove', () => {
+            console.log('window.mousemove')
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+        div {
+            width: 100px;
+            height: 100px;
+        }
+        #a {
+            background-color: red;
+        }
+        #b {
+            background-color: blue;
+        }
+    </style>
+</head>
+<body>
+    <div id="a">
+    </div>
+    <div id="b">
+    </div>
+</body>
+<script type="text/javascript">
+    let a = document.querySelector('#a');
+    a.addEventListener('mousedown', () => {
+        console.log(`mousedown for a`);
+    });
+    a.addEventListener('mousemove', () => {
+        console.log(`mousemove for a`);
+    });
+    a.addEventListener('mouseup', () => {
+        console.log(`mouseup for a`);
+    });
+
+    let b = document.querySelector('#b');
+    b.addEventListener('mousedown', () => {
+        console.log(`mousedown for b`);
+    });
+    b.addEventListener('mousemove', () => {
+        console.log(`mousemove for b`);
+    });
+    b.addEventListener('mouseup', () => {
+        console.log(`mouseup for b`);
+    });
+</script>
+</html>
