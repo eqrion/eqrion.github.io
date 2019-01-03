@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+        #no {
+            overflow-anchor: none;
+        }
+        #spacing {
+            margin-bottom: 300vh;
+        }
+    </style>
+    <script type="text/javascript">
+        let height = 0;
+        function grow() {
+            height += 50;
+
+            let expander = document.querySelector('#expander');
+            expander.style = `margin-bottom: ${height}px;`;
+        }
+    </script>
+</head>
+<body>
+    <div id="expander"></div>
+    <span id="no">This should not be selected as an anchor because of `overflow-anchor`. <button onclick="grow()">Grow expander</button></span>
+    <div id="spacing"></div>
+</body>
+</html>
