@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+        #column {
+            columns: 2;
+            column-fill: auto;
+            height: 600px;
+            background-color: gray;
+        }
+        #b {
+            background-color: green;
+        }
+        #d {
+            background-color: yellow;
+        }
+        .margin {
+            margin-bottom: 100px;
+        }
+        .candidate {
+            height: 300px;
+        }
+        .spacer {
+            margin-bottom: 300vh;
+        }
+    </style>
+    <script type="text/javascript">
+        function grow(selector) {
+            let element = document.querySelector(selector);
+            if (element.growHeight === undefined) {
+                element.growHeight = 100;
+            }
+            element.growHeight += 50;
+            element.style.marginBottom = `${element.growHeight}px`;
+        }
+    </script>
+</head>
+<body>
+    <div id="column">
+        <div class="margin" id="a">
+        </div>
+        <div class="candidate" id="b">
+        </div>
+        <div class="margin" id="c">
+        </div>
+        <div class="candidate" id="d">
+        </div>
+    </div>
+    <button onclick="grow('#a')">Grow first spacing</button>
+    <button onclick="grow('#c')">Grow second spacing</button>
+    <div class="spacer">
+    </div>
+</body>
+</html>

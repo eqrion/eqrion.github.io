@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title>Scroll anchor test 1</title>
+    <style type="text/css">
+        #before {
+            display: flex;
+            background-color: red;
+        }
+        #flex {
+            display: flex;
+            height: 120vh;
+        }
+        #space {
+            height: 300vh;
+        }
+    </style>
+    <script type="text/javascript">
+        let size = 0;
+        function grow() {
+            size += 200;
+            document.querySelector('#before')
+                .style = `height: ${size}px`;
+        }
+    </script>
+</head>
+<body>
+    <p>Test that a `display: flex` can be a scroll anchor.</p>
+    <p>Scroll down to button, and click it to grow element at top of page.</p>
+    <div id="before">
+    </div>
+    <div id="flex">
+    </div>
+    <button onclick="grow()">Grow flex height</button>
+    <div id="space">
+    </div>
+</body>
+</html>

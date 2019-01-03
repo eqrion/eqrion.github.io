@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+        #scroller {
+            overflow: scroll;
+            width: 600px;
+            height: 600px;
+            border: 1px solid black;
+        }
+        #header {
+            position: relative;
+            height: 100px;
+            background-color: gray;
+        }
+        #negative {
+          position: relative;
+          top: -900px;
+          height: 1000px;
+          width: 100px;
+          background-color: green;
+        }
+    </style>
+</head>
+<body>
+    <!-- The scroller should not be scrollable -->
+    <div id="scroller">
+        <div id="header">
+            <div id="negative">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
