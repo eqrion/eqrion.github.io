@@ -5,52 +5,63 @@
     <title></title>
     <style type="text/css">
         #column {
+            margin-top: 4em;
             columns: 2;
             column-fill: auto;
-            height: 600px;
+            height: 200vh;
             background-color: gray;
+        }
+        #a {
         }
         #b {
             background-color: green;
+            height: 20vh;
+        }
+        #c {
         }
         #d {
             background-color: yellow;
-        }
-        .margin {
-            margin-bottom: 100px;
-        }
-        .candidate {
-            height: 300px;
+            height: 20vh;
         }
         .spacer {
             margin-bottom: 300vh;
         }
     </style>
-    <script type="text/javascript">
-        function grow(selector) {
-            let element = document.querySelector(selector);
-            if (element.growHeight === undefined) {
-                element.growHeight = 100;
-            }
-            element.growHeight += 50;
-            element.style.marginBottom = `${element.growHeight}px`;
-        }
-    </script>
 </head>
 <body>
     <div id="column">
-        <div class="margin" id="a">
+        <div id="a">
         </div>
-        <div class="candidate" id="b">
+        <div id="b">
         </div>
-        <div class="margin" id="c">
+        <div id="c">
         </div>
-        <div class="candidate" id="d">
+        <div id="d">
         </div>
     </div>
-    <button onclick="grow('#a')">Grow first spacing</button>
-    <button onclick="grow('#c')">Grow second spacing</button>
     <div class="spacer">
     </div>
+    <script type="text/javascript">
+        let a = document.querySelector('#a');
+        let b = document.querySelector('#b');
+        let c = document.querySelector('#c');
+        let d = document.querySelector('#d');
+
+        a.grow = 190;
+        a.style.marginBottom = `${a.grow}vh`;
+        c.grow = 10;
+        c.style.marginBottom = `${c.grow}vh`;
+
+        addEventListener('keydown', (e) => {
+            let element;
+            if (e.key == 'a') {
+                element = document.querySelector('#a');
+            } else if (e.key == 'c') {
+                element = document.querySelector('#c');
+            }
+            element.grow += 5;
+            element.style.marginBottom = `${element.grow}vh`;
+        });
+    </script>
 </body>
 </html>
