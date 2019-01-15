@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+        #scroller {
+            overflow: scroll;
+            width: 500px;
+            height: 500px;
+            border: 1px solid black;
+        }
+        #table {
+          width: 500px;
+          height: 500px;
+          margin-top: 10px;
+          background-color: yellow;
+        }
+        #relative {
+            position: relative;
+        }
+        #absolute {
+          position: absolute;
+          top: -10000px;
+          left: -10000px;
+          height: 1px;
+          width: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div id="scroller">
+        <table id="table">
+            <tbody>
+                <tr><td><div id="relative"><div id="absolute">&nbsp;</div></div></td></tr>
+            </tbody>
+        </table>
+        <div id="trigger"></div>
+    </div>
+
+    <script type="text/javascript">
+        // scroll down to select #table as an anchor
+        // we don't select inside because of non-anoymous table parts
+        scroller.scrollTop = 5;
+
+        let flag = true;
+        function toggle() {
+            console.log(`toggle = ${toggle} st = ${scroller.scrollTop}`);
+
+            if (toggle) {
+                absolute.style.top = '-10000px';
+                trigger.innerText = 'b';
+            } else {
+                absolute.style.top = '0px';
+                trigger.innerText = 'a';
+            }
+            toggle = !toggle;
+        }
+        scroller.addEventListener('scroll', toggle);
+        toggle();
+    </script>
+</body>
+</html>
