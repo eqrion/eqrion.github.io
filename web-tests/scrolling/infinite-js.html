@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <meta name="viewport" content="width=device-width">
+    <title></title>
+    <style type="text/css"></style>
+    <script type=text/javascript src=https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js></script>
+    <script type="text/javascript" src="modified-infinity.js"></script>
+    <style type="text/css">
+        .row::before {
+            content: " ";
+            display: table;
+            line-height: 0;
+            clear: both;
+        }
+        .row::after {
+            content: " ";
+            display: table;
+            line-height: 0;
+            clear: both;
+        }
+        .row {
+            position: relative;
+        }
+        .col {
+            float: left;
+            position: relative;
+            width: 33.3%;
+            /*height: 200px;*/
+            margin-bottom: 16px;
+            font-weight: bold;
+            font-size: 5em;
+            text-align: center;
+        }
+        .a {
+            background-color: #eee;
+        }
+        .b {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div id="scroller">
+    </div>
+
+    <script type="text/javascript">
+        infinity.config.PAGE_TO_SCREEN_RATIO = 3;
+        infinity.config.SCROLL_THROTTLE = 200;
+
+        let ListView = infinity.ListView;
+        let ListItem = infinity.ListItem;
+
+        function buildRow(i) {
+            let html = '';
+            let cols = 18;
+            let j = i * 18;
+
+            html += '<div class="row">';
+            for (let i = 0; i < cols; i++, j++) {
+                html += `<div class="col ${j % 2 ? 'a' : 'b'}">${j + 1}</div>`;
+            }
+            html += '</div>';
+
+            return html;
+        }
+
+        let view = new ListView($('#scroller'));
+        for (let i = 0; i < 10; i++) {
+            view.append(buildRow(i));
+        }
+    </script>
+</body>
+</html>
