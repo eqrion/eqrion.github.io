@@ -311,6 +311,8 @@
   // Repartitions the pages array. This can be used for either defragmenting
   // the array, or recalculating everything on screen resize.
 
+  var windowHeight = $window.height();
+
   function repartition(listView) {
     dump(`listView repartition\n`);
     var currPage, newPage, index, length, itemIndex, pageLength, currItems, currItem,
@@ -327,12 +329,17 @@
       currItems = currPage.items;
       for(itemIndex = 0, pageLength = currItems.length; itemIndex < pageLength; itemIndex++) {
         currItem = currItems[itemIndex];
+        dump(`listView repartition clone\n`);
         nextItem = currItem.clone();
+        dump(`listView repartition hasVacancy\n`);
         if(newPage.hasVacancy()) {
+          dump(`listView repartition append\n`);
           newPage.append(nextItem);
         } else {
           newPage = new Page(listView);
+          dump(`listView repartition push\n`);
           newPages.push(newPage);
+          dump(`listView repartition append\n`);
           newPage.append(nextItem);
         }
       }
@@ -553,6 +560,7 @@
     // now.
 
     function resizeAll() {
+      windowHeight = $window.height();
       var index, curr;
       for(index = 0; curr = boundViews[index]; index++) {
         repartition(curr);

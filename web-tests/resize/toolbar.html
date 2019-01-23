@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+        div {
+            height: 600vh;
+            text-align: center;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div></div>
+    <script type="text/javascript">
+        let x = document.querySelector('div');
+        let i = 1;
+        function render() {
+            x.textContent = `resize ${i} [${document.documentElement.clientWidth}, ${document.documentElement.clientHeight}]`;
+            i += 1;
+        }
+        render();
+        window.addEventListener('resize', render);
+    </script>
+</body>
+</html>

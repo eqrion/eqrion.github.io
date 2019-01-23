@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+        #hidden {
+            overflow: hidden;
+        }
+        #button {
+            margin-top: 4em;
+        }
+        #anchor {
+            margin-bottom: 300vh;
+            height: 200px;
+            width: 200px;
+            background-color: green;
+        }
+    </style>
+    <script type="text/javascript">
+        function addElement() {
+            let expander = document.querySelector('#expander');
+            let div = document.createElement('div');
+            div.style = 'background-color: red; padding: 1em; width: 200px; height: 200px;';
+            expander.appendChild(div);
+        }
+    </script>
+</head>
+<body>
+    <div id="hidden">
+        <div id="expander"></div>
+        <button id="button" onclick="addElement()">Add element to top</button>
+        <div id="anchor"></div>
+    </div>
+</body>
+</html>
