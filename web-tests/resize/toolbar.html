@@ -3,6 +3,7 @@
 <html>
 <head>
     <title></title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
     <style type="text/css">
         div {
             height: 600vh;
@@ -14,14 +15,17 @@
 <body>
     <div></div>
     <script type="text/javascript">
+        let win = $(window);
         let x = document.querySelector('div');
         let i = 1;
+
         function render() {
             x.textContent = `resize ${i} [${document.documentElement.clientWidth}, ${document.documentElement.clientHeight}]`;
             i += 1;
         }
         render();
-        window.addEventListener('resize', render);
+
+        win.on('scroll', render);
     </script>
 </body>
 </html>
