@@ -71,8 +71,16 @@
             view.append(buildRow(i));
         }
 
+        function randomColor() {
+            let r = Math.random() * 128 + 64;
+            let g = Math.random() * 128 + 64;
+            let b = Math.random() * 128 + 64;
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
         addEventListener('click', () => {
             infinity.repartition(view);
+            document.body.style.backgroundColor = randomColor();
         });
     </script>
 </body>
