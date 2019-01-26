@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+        #scroller {
+            width: 600px;
+            height: 600px;
+            overflow: scroll;
+        }
+        .spacer {
+            height: 100px;
+        }
+        #anchor {
+            background-color: green;
+            width: 100px;
+            height: 100px;
+        }
+        #after {
+            margin-bottom: 1000px;
+        }
+    </style>
+</head>
+<body>
+    <div id="scroller">
+        <div id="anchor">
+        </div>
+        <div id="after">
+        </div>
+    </div>
+    <script type="text/javascript">
+        function spacer() {
+            let x = document.createElement('div');
+            x.className = 'spacer';
+            return x;
+        }
+        function assert_eq(a, b) {
+            if (a !== b) {
+                alert(`assert_eq failed: ${a} !== ${b}`);
+            }
+        }
+
+        let anchor = document.querySelector('#anchor');
+
+        // Initialize scroll anchoring
+        let a = spacer();
+        scroller.insertBefore(a, anchor);
+        scroller.scrollTop = 100;
+
+        // Add an element to trigger an adjustment
+        let b = spacer();
+        scroller.insertBefore(b, anchor);
+        assert_eq(scroller.scrollTop, 200);
+
+        // Add and remove an element with maybe a layout flush in-between
+        b.remove();
+        document.documentElement.clientHeight;
+
+        anchor.remove();
+        document.documentElement.clientHeight;
+
+        let c = spacer();
+        scroller.insertBefore(c, after);
+        scroller.insertBefore(anchor, after);
+
+        assert_eq(scroller.scrollTop, 200);
+    </script>
+</body>
+</html>

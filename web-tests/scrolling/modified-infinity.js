@@ -7,9 +7,7 @@
 !function(window, Math, $) {
   'use strict';
 
-  if (!dump) {
-    dump = console.log;
-  }
+  window.dump = console.log;
 
   // Welcome To Infinity
   // ===================
@@ -351,6 +349,8 @@
     insertPagesInView(listView);
   }
 
+
+  infinity.repartition = repartition;
 
   // ListView querying
   // -----------------
