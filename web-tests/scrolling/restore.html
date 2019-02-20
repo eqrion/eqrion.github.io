@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scroll restoration test</title>
+    <script type="text/javascript">
+        let checkpoints = {
+            "before_style": -1,
+            "before_body": -1,
+            "after_first": -1,
+            "after_second": -1,
+            "after_load": -1,
+            "after_contentloaded": -1,
+            "after_timeout": -1,
+        };
+        function checkpoint(name) {
+            if (document.documentElement) {
+                // This will unconditionally force a layout flush in Gecko,Blink
+                document.documentElement.getClientRects();
+            }
+            checkpoints[name] = window.scrollY;
+
+            console.log(`${name} = ${window.scrollY}`);
+            render();
+        }
+        function contentloaded() {
+            checkpoint('after_contentloaded');
+        }
+        function render() {
+            let output = document.querySelector('#output');
+            if (!output) {
+                return;
+            }
+            let log = '';
+            for (let checkpoint in checkpoints) {
+                let value = checkpoints[checkpoint];
+                if (value === -1) {
+                    continue;
+                }
+                log += `${checkpoint} = ${value}\n`;
+            }
+            output.innerText = log;
+        }
+        addEventListener('load', () => checkpoint('after_load'));
+        addEventListener('DOMContentLoaded', () => checkpoint('after_contentloaded'));
+        setTimeout(() => checkpoint('after_timeout'), 1000);
+    </script>
+    <script type="text/javascript">
+        checkpoint('before_style');
+    </script>
+    <style type="text/css">
+        * {
+            overflow-anchor: none;
+        }
+        #output {
+            position: fixed;
+        }
+        #first {
+            height: 300vh;
+            background-color: green;
+        }
+        #second {
+            height: 300vh;
+            background-color: blue;
+        }
+    </style>
+    <script type="text/javascript">
+        checkpoint('before_body');
+    </script>
+</head>
+<body>
+    <div id="output"></div>
+    <div id="first"></div>
+    <script type="text/javascript">
+        checkpoint('after_first');
+    </script>
+    <div id="second"></div>
+    <script type="text/javascript">
+        checkpoint('after_second');
+    </script>
+</body>
+</html>
