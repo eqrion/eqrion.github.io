@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+        html {
+            height: 500vh;
+        }
+    </style>
+    <script type="text/javascript">
+        window.addEventListener('scroll', () => {
+            console.log(`scroll ${window.scrollY}`);
+        });
+        window.scrollBy({top: 10});
+        window.scrollBy({top: -10});
+    </script>
+</head>
+</html>
