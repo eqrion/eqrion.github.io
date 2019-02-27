@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title>rAF and visibility</title>
+    <style type="text/css">
+        body {
+            margin: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        .container {
+            margin: 0;
+            margin-left: 1em;
+            margin-right: 1em;
+            height: 100vh;
+            overflow-y: scroll;
+        }
+        ol, li {
+            overflow-anchor: none;
+        }
+        .anchor {
+            height: 1px;
+            overflow-anchor: auto;
+        }
+    </style>
+    <script type="text/javascript">
+        let lastRaf = performance.now;
+
+        function renderRAF(now) {
+            requestAnimationFrame(renderRAF);
+
+            if (now - lastRaf < 500) {
+                return;
+            }
+            lastRaf = now;
+
+            let child = document.createElement('li');
+            child.textContent = `${now}`;
+
+            let raf = document.querySelector('#raf');
+            raf.append(child);
+        }
+        function renderVisibility() {
+            let visibility = document.querySelector('#visibility');
+            visibility.innerHTML += `<li>hidden = ${document.hidden}</li>`;
+        }
+        function render() {
+            renderVisibility();
+            renderRAF(performance.now());
+        }
+
+        requestAnimationFrame(renderRAF);
+        addEventListener('visibilitychange', renderVisibility);
+        addEventListener('load', render);
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>#requestAnimationFrame</h2>
+        <ol id="raf"></ol>
+        <div class="anchor"></div>
+    </div>
+    <div class="container">
+        <h2>#visibility</h2>
+        <ol id="visibility"></ol>
+        <div class="anchor"></div>
+    </div>
+</body>
+</html>
