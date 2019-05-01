@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <iframe
+        src="https://example.com"
+        width="600"
+        height="600"
+        fission></iframe>
+</body>
+<script type="text/javascript">
+    function tick(t) {
+        let s = t / 1000;
+        let x = Math.sin(s) * 400 + 600;
+        let i = document.querySelector('iframe');
+        i.width = x;
+        i.height = x;
+        requestAnimationFrame(tick);
+    }
+    tick(performance.now);
+</script>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <template id="iframe">
+        <iframe
+            src="https://example.com"
+            width="1024"
+            height="768"
+            fission></iframe>
+    </template>
+</body>
+<script type="text/javascript">
+    let t = document.querySelector('#iframe');
+    for (let i = 0; i < 100; i += 1) {
+        let c = t.cloneNode(true);
+        document.body.appendChild(c.content);
+    }
+</script>
+</html>
