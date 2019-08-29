@@ -1,5 +1,6 @@
 (module
 	(import "log" "i32" (func $log (param i32)))
+	(export "fib" $fib)
 	(func $fib (param $i i32) (result i32)
 		;; if i <= 1; return 1
 		local.get $i

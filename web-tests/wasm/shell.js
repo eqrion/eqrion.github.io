@@ -21,12 +21,14 @@ function wasmEval(code) {
 	let b = wasmTextToBinary(code);
 	let m = new WebAssembly.Module(b);
 	let i = new WebAssembly.Instance(m, wasmImports);
-	return { 'module': m, 'imports': i };
+	return { 'module': m, 'instance': i };
 }
 function wasmRun(file) {
 	let t = readRelativeToScript(file);
 	let b = wasmTextToBinary(t);
 	let m = new WebAssembly.Module(b);
 	let i = new WebAssembly.Instance(m, wasmImports);
-	return { 'module': m, 'imports': i };
+	let ret = { 'module': m, 'instance': i };
+	Object.assign(ret, i.exports);
+	return ret;
 }

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<textarea id="data"></textarea>
+	<button onclick="download()">Download</button>
+
+	<script type="text/javascript">
+		var saveByteArray = (function () {
+		    var a = document.createElement("a");
+		    document.body.appendChild(a);
+		    a.style = "display: none";
+		    return function (data, name) {
+		        var blob = new Blob(data, {type: "octet/stream"}),
+		            url = window.URL.createObjectURL(blob);
+		        a.href = url;
+		        a.download = name;
+		        a.click();
+		        window.URL.revokeObjectURL(url);
+		    };
+		}());
+		function download() {
+			let data = document.querySelector('#data');
+			let text = data.value;
+			// There has got to be a better way to do this
+			let unencoded = unescape(eval(`'${text}'`));
+			let binary = new Uint8Array(unencoded.length);
+			for (let i = 0; i < unencoded.length; i++) {
+				binary[i] = unencoded.charCodeAt(i);
+			}
+			saveByteArray([binary], 'data.bin');
+		}
+	</script>
+</body>
+</html>
