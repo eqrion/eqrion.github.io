@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<div id="vl"></div>
+	<div id="as"></div>
+
+	<script type="text/javascript">
+		vl.innerText = `Virtual memory limit: ${WebAssembly.virtualMemory}`;
+		as.innerText = `Address space: ${WebAssembly.addressSpace}`;
+	</script>
+</body>
+</html>
