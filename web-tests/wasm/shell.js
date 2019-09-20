@@ -24,8 +24,12 @@ function wasmEval(code) {
 	return { 'module': m, 'instance': i };
 }
 function wasmRun(file) {
-	let t = readRelativeToScript(file);
-	let b = wasmTextToBinary(t);
+	let b;
+	if (file.endsWith('.wasm')) {
+		b = readRelativeToScript(file, 'binary');
+	} else {
+		b = wasmTextToBinary(readRelativeToScript(file));
+	}
 	let m = new WebAssembly.Module(b);
 	let i = new WebAssembly.Instance(m, wasmImports);
 	let ret = { 'module': m, 'instance': i };

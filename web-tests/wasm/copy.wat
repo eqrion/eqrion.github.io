@@ -5,7 +5,7 @@
 	(func $a (param i32) (param i32)
 		local.get 0
 		local.get 1
-		i32.const 16
+		i32.const 20
 		memory.copy
 	)
 	(export "a" $a)
