@@ -1,5 +1,5 @@
 
-const iterations = 5000000;
+const iterations = 500000;
 const json = false;
 const sizes = [1, 4, 8, 16, 32, 64, 128, 256, 512];
 const tests = ['bulk_memcpy_down',
@@ -20,6 +20,7 @@ function load(path, callback) {
 }
 function quit() { }
 function print(text) {
+  console.log(text);
   let log = document.getElementById('log');
   let content = document.createTextNode(`${text}
 `);
