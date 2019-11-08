@@ -16,7 +16,7 @@ const tests = ['bulk_memcpy_down',
 function load(path, callback) {
   print(`loading ${path}`);
   WebAssembly.instantiateStreaming(fetch(path), {})
-    .then(obj => callback(obj.instance));
+    .then(async (obj) => await callback(obj.instance));
 }
 function quit() { }
 function print(text) {
@@ -26,8 +26,13 @@ function print(text) {
 `);
   log.appendChild(content);
 }
+async function yield() {
+  return new Promise((resolve, reject) => setTimeout(() => {
+    resolve();
+  }, 0));
+}
 
-function run(instance) {
+async function run(instance) {
   let results = {};
 
   for (let name of tests) {
@@ -45,6 +50,7 @@ function run(instance) {
 
       print(`${name}(${size}) = ${delta}`);
       results[name][size] = delta;
+      await yield();
     }
   }
 
