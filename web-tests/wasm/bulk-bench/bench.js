@@ -14,7 +14,7 @@ const tests = ['bulk_memcpy_down',
                'plain_stores'];
 
 function load(path, callback) {
-  print('loading ${path}`);
+  print(`loading ${path}`);
   WebAssembly.instantiateStreaming(fetch(path), {})
     .then(obj => callback(obj.instance));
 }
