@@ -1,5 +1,5 @@
 
-const iterations = 500000;
+const iterations = 5000000;
 const json = false;
 const sizes = [1, 4, 8, 16, 32, 64, 128, 256, 512];
 const tests = ['bulk_memcpy_down',
@@ -14,15 +14,15 @@ const tests = ['bulk_memcpy_down',
                'plain_stores'];
 
 function load(path, callback) {
+  print('loading ${path}`);
   WebAssembly.instantiateStreaming(fetch(path), {})
     .then(obj => callback(obj.instance));
 }
-function quit() {
-  output('done');
-}
+function quit() { }
 function print(text) {
   let log = document.getElementById('log');
-  let content = document.createTextNode(text);
+  let content = document.createTextNode(`${text}
+`);
   log.appendChild(content);
 }
 
