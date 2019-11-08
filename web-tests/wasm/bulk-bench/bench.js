@@ -33,6 +33,9 @@ async function yield() {
 }
 
 async function run(instance) {
+  print(`iterations = ${iterations}`);
+  await yield();
+
   let results = {};
 
   for (let name of tests) {
@@ -48,8 +51,8 @@ async function run(instance) {
       let end = performance.now();
       let delta = end - start;
 
-      print(`${name}(${size}) = ${delta}`);
       results[name][size] = delta;
+      print(`${name}(${size}) = ${delta}`);
       await yield();
     }
   }
