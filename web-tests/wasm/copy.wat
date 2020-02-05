@@ -10,13 +10,13 @@
 	)
 	(export "a" $a)
 
-	(func $b (param i32) (param i32)
-		local.get 0
-		local.get 1
-		i32.const 8
-		memory.fill
-	)
-	(export "b" $b)
+	;; (func $b (param i32) (param i32)
+	;; 	local.get 0
+	;; 	local.get 1
+	;; 	i32.const 8
+	;; 	memory.fill
+	;; )
+	;; (export "b" $b)
 
 	(func $at (param i32) (result i32)
 		local.get 0

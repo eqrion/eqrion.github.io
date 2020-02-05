@@ -1,12 +1,13 @@
 const wasmImports = {
-  log: {
-    i32: function(arg) {
-      console.log(arg);
-    },
-    char: function(arg) {
-      console.log(String.fromCharCode(arg));
-    }
-  }
+  'log': interfaceLog,
+  // log: {
+  //   i32: function(arg) {
+  //     console.log(arg);
+  //   },
+  //   char: function(arg) {
+  //     console.log(String.fromCharCode(arg));
+  //   }
+  // }
 };
 function wasmValidate(file) {
 	let t = readRelativeToScript(file);
